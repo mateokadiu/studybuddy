@@ -1,0 +1,41 @@
+{
+  "name": "studybuddy",
+  "version": "0.1.0",
+  "private": true,
+  "description": "On-device RAG study app: drop in a PDF, get FSRS-scheduled flashcards and chat with the doc. Fully offline.",
+  "license": "MIT",
+  "author": "Mateo Kadiu <mateokadiu17@gmail.com>",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.62.0",
+    "drizzle-orm": "^0.36.0",
+    "gpt-3-encoder": "^1.1.4",
+    "uuid": "^11.0.0",
+    "zod": "^3.23.8",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/uuid": "^10.0.0",
+    "drizzle-kit": "^0.28.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

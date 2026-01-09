@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, blob, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, blob, index } from 'drizzle-orm/sqlite-core';
 
 /**
  * documents
@@ -45,7 +45,80 @@ export const chunks = sqliteTable(
   }),
 );
 
+/**
+ * decks
+ *   one default deck per doc (auto-generated) + any user-created decks.
+ *   tracks the model + prompt version that produced its cards so we can
+ *   regen on demand and compare quality across prompt iterations.
+ */
+export const decks = sqliteTable('decks', {
+  id: text('id').primaryKey(),
+  docId: text('doc_id').references(() => documents.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  generatedWithModel: text('generated_with_model').notNull(),
+  generatedWithPromptVersion: text('generated_with_prompt_version').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+});
+
+/**
+ * cards
+ *   flashcard with FSRS state inline. `questionEmbedding` lets us dedup
+ *   near-identical cards via cosine sim during generation.
+ *   FSRS fields default to "new" — first review transitions to learning.
+ */
+export const cards = sqliteTable(
+  'cards',
+  {
+    id: text('id').primaryKey(),
+    deckId: text('deck_id')
+      .notNull()
+      .references(() => decks.id, { onDelete: 'cascade' }),
+    sourceChunkId: text('source_chunk_id').references(() => chunks.id),
+    type: text('type').notNull(),
+    front: text('front').notNull(),
+    back: text('back').notNull(),
+    pageCite: integer('page_cite'),
+    questionEmbedding: blob('question_embedding', { mode: 'buffer' }),
+    stability: real('stability').notNull().default(0),
+    difficulty: real('difficulty').notNull().default(0),
+    elapsedDays: real('elapsed_days').notNull().default(0),
+    scheduledDays: real('scheduled_days').notNull().default(0),
+    reps: integer('reps').notNull().default(0),
+    lapses: integer('lapses').notNull().default(0),
+    state: text('state').notNull().default('new'),
+    due: integer('due', { mode: 'timestamp_ms' }).notNull(),
+    lastReview: integer('last_review', { mode: 'timestamp_ms' }),
+  },
+  (t) => ({
+    dueIdx: index('cards_due_idx').on(t.due, t.state),
+    deckIdx: index('cards_deck_idx').on(t.deckId),
+  }),
+);
+
+/**
+ * reviews
+ *   append-only log of every grade. used for the heatmap, retention
+ *   curve, and (eventually) FSRS param optimization per-user.
+ */
+export const reviews = sqliteTable('reviews', {
+  id: text('id').primaryKey(),
+  cardId: text('card_id')
+    .notNull()
+    .references(() => cards.id, { onDelete: 'cascade' }),
+  rating: integer('rating').notNull(),
+  durationMs: integer('duration_ms').notNull(),
+  stabilityBefore: real('stability_before').notNull(),
+  stabilityAfter: real('stability_after').notNull(),
+  reviewedAt: integer('reviewed_at', { mode: 'timestamp_ms' }).notNull(),
+});
+
 export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
 export type Chunk = typeof chunks.$inferSelect;
 export type NewChunk = typeof chunks.$inferInsert;
+export type Deck = typeof decks.$inferSelect;
+export type NewDeck = typeof decks.$inferInsert;
+export type Card = typeof cards.$inferSelect;
+export type NewCard = typeof cards.$inferInsert;
+export type Review = typeof reviews.$inferSelect;
+export type NewReview = typeof reviews.$inferInsert;

@@ -64,7 +64,6 @@ export const decks = sqliteTable('decks', {
  * cards
  *   flashcard with FSRS state inline. `questionEmbedding` lets us dedup
  *   near-identical cards via cosine sim during generation.
- *   FSRS fields default to "new" — first review transitions to learning.
  */
 export const cards = sqliteTable(
   'cards',
@@ -112,6 +111,45 @@ export const reviews = sqliteTable('reviews', {
   reviewedAt: integer('reviewed_at', { mode: 'timestamp_ms' }).notNull(),
 });
 
+/**
+ * chats
+ *   doc-scoped RAG conversation. one chat per (doc, session) — multiple
+ *   chats per doc are fine. title is auto-set from the first user msg.
+ */
+export const chats = sqliteTable('chats', {
+  id: text('id').primaryKey(),
+  docId: text('doc_id')
+    .notNull()
+    .references(() => documents.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+});
+
+/**
+ * chat_messages
+ *   role = 'user' | 'assistant'. cites is a JSON array of { chunkId, page }
+ *   parsed from the model output on the fly so we can re-render the chips
+ *   without re-running retrieval.
+ */
+export const chatMessages = sqliteTable(
+  'chat_messages',
+  {
+    id: text('id').primaryKey(),
+    chatId: text('chat_id')
+      .notNull()
+      .references(() => chats.id, { onDelete: 'cascade' }),
+    role: text('role').notNull(),
+    content: text('content').notNull(),
+    cites: text('cites'),
+    tokensIn: integer('tokens_in'),
+    tokensOut: integer('tokens_out'),
+    createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  (t) => ({
+    chatIdx: index('chat_messages_chat_idx').on(t.chatId, t.createdAt),
+  }),
+);
+
 export type Document = typeof documents.$inferSelect;
 export type NewDocument = typeof documents.$inferInsert;
 export type Chunk = typeof chunks.$inferSelect;
@@ -122,3 +160,7 @@ export type Card = typeof cards.$inferSelect;
 export type NewCard = typeof cards.$inferInsert;
 export type Review = typeof reviews.$inferSelect;
 export type NewReview = typeof reviews.$inferInsert;
+export type Chat = typeof chats.$inferSelect;
+export type NewChat = typeof chats.$inferInsert;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type NewChatMessage = typeof chatMessages.$inferInsert;

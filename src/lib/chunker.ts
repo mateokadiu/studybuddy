@@ -36,6 +36,8 @@ export interface ChunkOptions {
   targetTokens?: number;
   /** soft maximum tokens before we force-flush (default 600) */
   maxTokens?: number;
+  /** overlap tokens carried into the next chunk (default 64) */
+  overlapTokens?: number;
 }
 
 /** Split a page into paragraphs by blank-line boundaries. */
@@ -67,9 +69,31 @@ export function countTokens(s: string): number {
  * until the running token count hits targetTokens, then flushes. Page span
  * and char offset are tracked across the input stream.
  */
+/**
+ * Take the trailing ~overlap tokens of a chunk to seed the next chunk so
+ * context flows across boundaries. Snaps to sentence boundary when we can.
+ */
+function trailingOverlap(text: string, overlapTokens: number): string {
+  if (overlapTokens <= 0) return '';
+  const sents = sentences(text);
+  let acc = '';
+  let acct = 0;
+  // walk sentences from the end
+  for (let i = sents.length - 1; i >= 0; i--) {
+    const s = sents[i] as string;
+    const t = countTokens(s);
+    if (acct + t > overlapTokens && acc.length > 0) break;
+    acc = acc.length === 0 ? s : `${s} ${acc}`;
+    acct += t;
+    if (acct >= overlapTokens) break;
+  }
+  return acc;
+}
+
 export function chunkByTokens(pages: PageText[], opts: ChunkOptions = {}): RawChunk[] {
   const target = opts.targetTokens ?? 512;
   const max = opts.maxTokens ?? Math.max(target + 100, Math.floor(target * 1.2));
+  const overlap = opts.overlapTokens ?? 64;
 
   const out: RawChunk[] = [];
   let charCursor = 0;
@@ -79,9 +103,13 @@ export function chunkByTokens(pages: PageText[], opts: ChunkOptions = {}): RawCh
   let bufStartPage = 0;
   let bufEndPage = 0;
   let bufStartOffset = 0;
+  let pendingOverlap = '';
 
   const flush = () => {
-    if (bufText.length === 0) return;
+    if (bufText.length === 0) {
+      pendingOverlap = '';
+      return;
+    }
     out.push({
       idx: idx++,
       pageStart: bufStartPage,
@@ -90,6 +118,7 @@ export function chunkByTokens(pages: PageText[], opts: ChunkOptions = {}): RawCh
       text: bufText,
       tokenCount: bufTokens,
     });
+    pendingOverlap = trailingOverlap(bufText, overlap);
     bufText = '';
     bufTokens = 0;
   };
@@ -99,8 +128,16 @@ export function chunkByTokens(pages: PageText[], opts: ChunkOptions = {}): RawCh
     if (bufText.length === 0) {
       bufStartPage = page;
       bufStartOffset = charCursor;
-      bufText = unit;
-      bufTokens = unitTokens;
+      if (pendingOverlap.length > 0) {
+        bufText = pendingOverlap;
+        bufTokens = countTokens(pendingOverlap);
+        bufText = `${bufText}${sep}${unit}`;
+        bufTokens += unitTokens;
+        pendingOverlap = '';
+      } else {
+        bufText = unit;
+        bufTokens = unitTokens;
+      }
     } else if (bufTokens + unitTokens <= max) {
       bufText = `${bufText}${sep}${unit}`;
       bufTokens += unitTokens;
@@ -108,8 +145,16 @@ export function chunkByTokens(pages: PageText[], opts: ChunkOptions = {}): RawCh
       flush();
       bufStartPage = page;
       bufStartOffset = charCursor;
-      bufText = unit;
-      bufTokens = unitTokens;
+      if (pendingOverlap.length > 0) {
+        bufText = pendingOverlap;
+        bufTokens = countTokens(pendingOverlap);
+        bufText = `${bufText}${sep}${unit}`;
+        bufTokens += unitTokens;
+        pendingOverlap = '';
+      } else {
+        bufText = unit;
+        bufTokens = unitTokens;
+      }
     }
     bufEndPage = page;
     charCursor += unit.length + sep.length;
@@ -122,7 +167,6 @@ export function chunkByTokens(pages: PageText[], opts: ChunkOptions = {}): RawCh
       if (paraTokens <= max) {
         appendUnit(para, page.page);
       } else {
-        // paragraph too long — fall back to sentence-level packing
         for (const sent of sentences(para)) {
           appendUnit(sent, page.page, ' ');
         }

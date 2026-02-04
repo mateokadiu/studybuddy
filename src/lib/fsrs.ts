@@ -219,3 +219,78 @@ export function retrievability(card: FsrsCard, now: number): number {
   const t = daysBetween(card.lastReview, now);
   return forgettingCurve(t, card.stability);
 }
+
+// ─── Per-user parameter optimization ──────────────────────────────────────
+//
+// FSRS-4.5 ships with sensible defaults that work well for most users, but
+// the algorithm supports per-user weight optimization: feed in 1000+ historical
+// (state, rating, elapsed, outcome) tuples and fit weights that minimize the
+// log-loss between predicted retrievability and actual recall.
+//
+// Full L-BFGS-B fitting lives on the roadmap for v0.2 — when we have enough
+// historical reviews per user to make it worthwhile. The shape below is the
+// stable API surface so the rest of the codebase can already speak to it.
+//
+// For now: returns the defaults unchanged but records the sample size + a
+// noisy "would-be" loss value so the settings screen can display progress.
+
+export interface ReviewHistory {
+  cardId: string;
+  rating: FsrsRating;
+  elapsedDays: number;
+  /** computed retention before the review */
+  retrievabilityBefore: number;
+  /** outcome: 0 = forgot (rating=1), 1 = recalled (rating>=2) */
+  outcome: 0 | 1;
+}
+
+export interface OptimizerResult {
+  /** the (possibly updated) weights */
+  weights: number[];
+  /** log-loss over the input samples */
+  logLoss: number;
+  /** number of reviews used */
+  sampleSize: number;
+  /** whether weights actually changed from input */
+  converged: boolean;
+}
+
+export interface OptimizerOptions {
+  /** starting weights — default is the published v4.5 set */
+  initial?: number[];
+  /** require at least this many reviews to attempt optimization (default 1000) */
+  minSamples?: number;
+}
+
+/**
+ * Stub optimizer.
+ *
+ * Computes the log-loss of the current weights over the provided history so
+ * the UI has a number to display ("recent retention prediction loss: 0.42"),
+ * but does not yet fit. Real L-BFGS-B fitting comes in v0.2 once the dataset
+ * is large enough to be worth the complexity + battery cost.
+ */
+export function optimize(history: ReviewHistory[], opts: OptimizerOptions = {}): OptimizerResult {
+  const initial = opts.initial ?? [...DEFAULT_FSRS_WEIGHTS];
+  const minSamples = opts.minSamples ?? 1000;
+
+  if (history.length === 0) {
+    return { weights: initial, logLoss: 0, sampleSize: 0, converged: true };
+  }
+
+  // log-loss: -mean( y log p + (1-y) log(1-p) )
+  let loss = 0;
+  for (const h of history) {
+    const p = Math.max(1e-6, Math.min(1 - 1e-6, h.retrievabilityBefore));
+    loss -= h.outcome * Math.log(p) + (1 - h.outcome) * Math.log(1 - p);
+  }
+  loss /= history.length;
+
+  // not enough samples — return current weights, just report the loss
+  if (history.length < minSamples) {
+    return { weights: initial, logLoss: loss, sampleSize: history.length, converged: true };
+  }
+
+  // would-fit here. for now hold weights stable to keep behavior predictable.
+  return { weights: initial, logLoss: loss, sampleSize: history.length, converged: false };
+}

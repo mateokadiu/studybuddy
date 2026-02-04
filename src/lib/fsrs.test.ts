@@ -5,6 +5,8 @@ import {
   retrievability,
   defaultConfig,
   DEFAULT_FSRS_WEIGHTS,
+  optimize,
+  type ReviewHistory,
 } from './fsrs';
 
 const NOW = Date.UTC(2026, 0, 1, 9, 0, 0); // 2026-01-01 09:00 UTC
@@ -121,5 +123,26 @@ describe('reference vectors', () => {
     const expectedD = (w[4] as number) - Math.exp((w[5] as number) * 2) + 1;
     const out = schedule(newCard(NOW), 3, NOW, NO_FUZZ);
     expect(out.difficulty).toBeCloseTo(Math.max(1, Math.min(10, expectedD)), 4);
+  });
+});
+
+describe('optimize (stub)', () => {
+  it('returns initial weights on empty history', () => {
+    const r = optimize([]);
+    expect(r.weights).toEqual(DEFAULT_FSRS_WEIGHTS);
+    expect(r.sampleSize).toBe(0);
+  });
+
+  it('reports log-loss for small history but keeps weights stable', () => {
+    const hist: ReviewHistory[] = [
+      { cardId: 'a', rating: 3, elapsedDays: 5, retrievabilityBefore: 0.9, outcome: 1 },
+      { cardId: 'b', rating: 1, elapsedDays: 30, retrievabilityBefore: 0.5, outcome: 0 },
+      { cardId: 'c', rating: 4, elapsedDays: 1, retrievabilityBefore: 0.99, outcome: 1 },
+    ];
+    const r = optimize(hist);
+    expect(r.sampleSize).toBe(3);
+    expect(r.logLoss).toBeGreaterThan(0);
+    expect(r.weights).toEqual(DEFAULT_FSRS_WEIGHTS);
+    expect(r.converged).toBe(true);
   });
 });

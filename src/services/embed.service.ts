@@ -15,6 +15,9 @@
 
 export const EMBED_DIM = 384;
 
+/** Hard cap on inputs per native call. Set to match PLAN §3 ingest budget. */
+export const EMBED_BATCH_SIZE = 16;
+
 export interface EmbedService {
   /** embed a single string, returns one 384-dim Float32Array */
   embed(text: string): Promise<Float32Array>;
@@ -22,6 +25,57 @@ export interface EmbedService {
   embedBatch(texts: ReadonlyArray<string>): Promise<Float32Array[]>;
   /** model id currently loaded ('mock' in dev path) */
   modelId(): string;
+}
+
+/**
+ * Wrap an arbitrary embed function so that it's called at most
+ * EMBED_BATCH_SIZE inputs at a time, with optional onProgress for UI.
+ */
+export async function embedAllChunked(
+  svc: EmbedService,
+  texts: ReadonlyArray<string>,
+  onProgress?: (done: number, total: number) => void,
+): Promise<Float32Array[]> {
+  const out: Float32Array[] = new Array(texts.length);
+  for (let i = 0; i < texts.length; i += EMBED_BATCH_SIZE) {
+    const slice = texts.slice(i, i + EMBED_BATCH_SIZE);
+    const part = await svc.embedBatch(slice);
+    for (let j = 0; j < part.length; j++) out[i + j] = part[j] as Float32Array;
+    onProgress?.(Math.min(i + slice.length, texts.length), texts.length);
+  }
+  return out;
+}
+
+export interface BenchResult {
+  /** total ms */
+  totalMs: number;
+  /** ms per embedding (mean) */
+  msPerEmbed: number;
+  /** embeds per second */
+  embedsPerSec: number;
+  /** how many inputs we ran */
+  count: number;
+}
+
+/**
+ * Drive the embed service over `texts` (or `count` repeats of a fixed sample)
+ * and measure throughput. Used by the settings benchmark screen.
+ */
+export async function benchEmbed(
+  svc: EmbedService,
+  textsOrCount: ReadonlyArray<string> | number,
+): Promise<BenchResult> {
+  const texts =
+    typeof textsOrCount === 'number'
+      ? Array.from({ length: textsOrCount }, (_, i) => `bench input ${i} — the quick brown fox.`)
+      : textsOrCount;
+
+  const t0 = Date.now();
+  await embedAllChunked(svc, texts);
+  const totalMs = Date.now() - t0;
+  const msPerEmbed = totalMs / Math.max(1, texts.length);
+  const embedsPerSec = msPerEmbed > 0 ? 1000 / msPerEmbed : Number.POSITIVE_INFINITY;
+  return { totalMs, msPerEmbed, embedsPerSec, count: texts.length };
 }
 
 function useReal(): boolean {

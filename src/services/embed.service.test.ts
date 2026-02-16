@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { EMBED_DIM, getEmbedService, mockEmbed } from './embed.service';
+import {
+  EMBED_DIM,
+  EMBED_BATCH_SIZE,
+  getEmbedService,
+  mockEmbed,
+  embedAllChunked,
+  benchEmbed,
+} from './embed.service';
 import { cosine } from '@/lib/cosine';
 
 describe('embed service (mock)', () => {
@@ -50,5 +57,28 @@ describe('embed service (mock)', () => {
 
   it('modelId is "mock" in dev', () => {
     expect(getEmbedService().modelId()).toBe('mock');
+  });
+});
+
+describe('embedAllChunked', () => {
+  it('respects EMBED_BATCH_SIZE and emits progress', async () => {
+    const svc = getEmbedService();
+    const inputs = Array.from({ length: EMBED_BATCH_SIZE * 3 + 2 }, (_, i) => `chunk ${i}`);
+    const progressCalls: { done: number; total: number }[] = [];
+    const out = await embedAllChunked(svc, inputs, (done, total) =>
+      progressCalls.push({ done, total }),
+    );
+    expect(out).toHaveLength(inputs.length);
+    expect(progressCalls).toHaveLength(4); // 16, 32, 48, 50
+    expect(progressCalls.at(-1)!.done).toBe(inputs.length);
+  });
+});
+
+describe('benchEmbed', () => {
+  it('returns a sensible result', async () => {
+    const r = await benchEmbed(getEmbedService(), 32);
+    expect(r.count).toBe(32);
+    expect(r.totalMs).toBeGreaterThanOrEqual(0);
+    expect(r.embedsPerSec).toBeGreaterThan(0);
   });
 });

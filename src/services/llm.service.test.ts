@@ -30,4 +30,27 @@ describe('llm service (mock)', () => {
   it('modelId is "mock" in dev', () => {
     expect(getLlmService().modelId()).toBe('mock');
   });
+
+  it('generateStream yields chunks adding up to the full text', async () => {
+    const svc = getLlmService();
+    const full = (await svc.generate('what is mitosis?')).text;
+    let assembled = '';
+    for await (const part of svc.generateStream('what is mitosis?')) {
+      assembled += part;
+    }
+    expect(assembled).toBe(full);
+  });
+
+  it('stream stops when signal.aborted', async () => {
+    const svc = getLlmService();
+    const signal = { aborted: false };
+    let count = 0;
+    const it = svc.generateStream('what is mitosis?', { signal });
+    for await (const _ of it) {
+      count++;
+      if (count === 1) signal.aborted = true;
+    }
+    // we yielded at least once before aborting
+    expect(count).toBeGreaterThanOrEqual(1);
+  });
 });

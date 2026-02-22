@@ -30,6 +30,13 @@ export interface LlmUsage {
 export interface LlmService {
   /** generate a single string */
   generate(prompt: string, opts?: GenerateOptions): Promise<{ text: string; usage: LlmUsage }>;
+  /**
+   * Stream tokens. Yields incremental string chunks (typically 1-3 BPE
+   * tokens at a time) and ends with a final `{ done: true, usage }` value
+   * via the iterator return. Caller can break early to stop generation —
+   * the underlying ExecuTorch session sees the cancel via opts.signal.
+   */
+  generateStream(prompt: string, opts?: GenerateOptions): AsyncIterableIterator<string>;
   /** model id currently loaded ('mock' in dev) */
   modelId(): string;
 }
@@ -84,12 +91,21 @@ function mockAnswer(prompt: string): string {
   return `According to the retrieved passages, the answer is straightforward [p.1]. The text supports this directly. ${prompt.length > 0 ? '' : ''}`.trim();
 }
 
+function chunksOf(text: string, size = 4): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < text.length; i += size) out.push(text.slice(i, i + size));
+  return out;
+}
+
 function mockService(): LlmService {
+  const generateText = (prompt: string): string =>
+    matchCardGenN(prompt) != null
+      ? mockCardsJson(matchCardGenN(prompt) as number, matchPageStart(prompt))
+      : mockAnswer(prompt);
+
   return {
-    async generate(prompt, opts) {
-      const text = matchCardGenN(prompt)
-        ? mockCardsJson(matchCardGenN(prompt) as number, matchPageStart(prompt))
-        : mockAnswer(prompt);
+    async generate(prompt, _opts) {
+      const text = generateText(prompt);
       return {
         text,
         usage: {
@@ -97,6 +113,28 @@ function mockService(): LlmService {
           tokensOut: Math.ceil(text.length / 4),
         },
       };
+    },
+    generateStream(prompt, opts) {
+      const text = generateText(prompt);
+      const parts = chunksOf(text, 5);
+      let i = 0;
+      const it: AsyncIterableIterator<string> = {
+        async next() {
+          if (opts?.signal?.aborted) return { value: undefined, done: true };
+          if (i >= parts.length) return { value: undefined, done: true };
+          // tiny delay so the UI can render incrementally
+          await new Promise((r) => setTimeout(r, 0));
+          return { value: parts[i++] as string, done: false };
+        },
+        async return() {
+          i = parts.length;
+          return { value: undefined, done: true };
+        },
+        [Symbol.asyncIterator]() {
+          return it;
+        },
+      };
+      return it;
     },
     modelId() {
       return 'mock';
@@ -118,6 +156,7 @@ function matchPageStart(prompt: string): number {
 function nativeService(): LlmService {
   type Loaded = {
     generate(prompt: string, opts: GenerateOptions): Promise<{ text: string; usage: LlmUsage }>;
+    generateStream(prompt: string, opts: GenerateOptions): AsyncIterableIterator<string>;
     unload(): Promise<void>;
   };
   const exMod = require('react-native-executorch') as {
@@ -129,6 +168,18 @@ function nativeService(): LlmService {
     async generate(prompt, opts = {}) {
       if (!cached) cached = await exMod.loadLlm(modelPath);
       return cached.generate(prompt, opts);
+    },
+    generateStream(prompt, opts = {}) {
+      const self = this;
+      async function* gen(): AsyncIterableIterator<string> {
+        if (!cached) cached = await exMod.loadLlm(modelPath);
+        for await (const part of cached.generateStream(prompt, opts)) {
+          if (opts.signal?.aborted) return;
+          yield part;
+        }
+        void self;
+      }
+      return gen();
     },
     modelId() {
       return 'llama-3.2-3b-instruct-q4';

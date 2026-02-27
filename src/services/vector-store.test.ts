@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { packEmbedding, unpackEmbedding } from './vector-store';
+import {
+  packEmbedding,
+  unpackEmbedding,
+  registerCosineUDF,
+  isCosineUDFAvailable,
+  benchTopKJs,
+} from './vector-store';
 
 describe('embedding pack/unpack', () => {
   it('round-trips a float32 vector', () => {
@@ -14,5 +20,28 @@ describe('embedding pack/unpack', () => {
     const back = unpackEmbedding(null);
     expect(back.length).toBe(384);
     expect(back[0]).toBe(0);
+  });
+});
+
+describe('cosine UDF', () => {
+  it('does not register on node', () => {
+    const ok = registerCosineUDF();
+    expect(ok).toBe(false);
+    expect(isCosineUDFAvailable()).toBe(false);
+  });
+});
+
+describe('benchTopKJs', () => {
+  it('returns a sensible result over a synthetic batch', () => {
+    const dim = 16;
+    const n = 200;
+    const matrix = new Float32Array(n * dim);
+    for (let i = 0; i < matrix.length; i++) matrix[i] = Math.random();
+    const query = new Float32Array(dim);
+    for (let i = 0; i < dim; i++) query[i] = Math.random();
+    const r = benchTopKJs(query, matrix, dim, 5);
+    expect(r.rowCount).toBe(n);
+    expect(r.jsMs).toBeGreaterThanOrEqual(0);
+    expect(r.udfMs).toBeNull();
   });
 });

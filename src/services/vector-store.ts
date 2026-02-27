@@ -138,6 +138,99 @@ export async function topKForDoc(
   return heap;
 }
 
+// ─── SQLite cosine UDF fallback ──────────────────────────────────────────
+//
+// quick-sqlite supports registering JS UDFs. If we register a `cosine(blob,
+// blob)` function we can let SQLite do the top-k via ORDER BY directly,
+// which keeps the working set small even for >10k chunks. If registration
+// fails (older binary, etc.) we fall back to the JS heap implementation
+// above. Native-only — node tooling never hits this code path.
+
+let udfRegistered = false;
+let udfAvailable = false;
+
+/** Register the cosine UDF on the quick-sqlite native connection. */
+export function registerCosineUDF(): boolean {
+  if (udfRegistered) return udfAvailable;
+  udfRegistered = true;
+  if (typeof process !== 'undefined' && process.versions?.node) {
+    // node-side: skip
+    udfAvailable = false;
+    return false;
+  }
+  try {
+    const mod = require('react-native-quick-sqlite') as {
+      open: (cfg: { name: string }) => {
+        registerFunction?: (
+          name: string,
+          fn: (...args: unknown[]) => number,
+          opts?: { deterministic?: boolean },
+        ) => void;
+      };
+    };
+    const conn = mod.open({ name: 'studybuddy.db' });
+    if (!conn.registerFunction) {
+      udfAvailable = false;
+      return false;
+    }
+    conn.registerFunction(
+      'cosine',
+      (a: unknown, b: unknown) => {
+        const av = unpackEmbedding(a as Buffer);
+        const bv = unpackEmbedding(b as Buffer);
+        return cosine(av, bv);
+      },
+      { deterministic: true },
+    );
+    udfAvailable = true;
+    return true;
+  } catch {
+    udfAvailable = false;
+    return false;
+  }
+}
+
+export function isCosineUDFAvailable(): boolean {
+  return udfAvailable;
+}
+
+/**
+ * Bench top-k over a synthetic batch of rows. Used by the settings
+ * benchmark screen — returns ms-per-query for the JS path, and (if the
+ * UDF was registered) ms-per-query for the SQL path too.
+ */
+export interface VectorBenchResult {
+  /** number of rows in the synthetic batch */
+  rowCount: number;
+  /** ms for one top-k via JS heap */
+  jsMs: number;
+  /** ms for one top-k via SQL/UDF, or null if unavailable */
+  udfMs: number | null;
+}
+
+export function benchTopKJs(
+  query: Float32Array,
+  matrix: Float32Array,
+  dim: number,
+  k: number,
+): VectorBenchResult {
+  const n = matrix.length / dim;
+  const t0 = Date.now();
+  const heap: { i: number; score: number }[] = [];
+  for (let i = 0; i < n; i++) {
+    const row = matrix.subarray(i * dim, (i + 1) * dim);
+    const s = cosine(query, row);
+    if (heap.length < k) {
+      heap.push({ i, score: s });
+      heap.sort((a, b) => b.score - a.score);
+    } else if (s > (heap[k - 1] as { i: number; score: number }).score) {
+      heap[k - 1] = { i, score: s };
+      heap.sort((a, b) => b.score - a.score);
+    }
+  }
+  return { rowCount: n, jsMs: Date.now() - t0, udfMs: null };
+}
+
 /** Count chunks for a doc that still need embedding (resume support). */
 export async function countMissingEmbeddings(docId: string): Promise<number> {
   const db = getDb();

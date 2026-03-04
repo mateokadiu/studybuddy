@@ -12,10 +12,35 @@
 
 import type { PageText } from '@/lib/chunker';
 
+export interface PageWithOffset extends PageText {
+  /** char offset into the joined doc text where this page starts */
+  charOffset: number;
+}
+
 export interface ExtractedPdf {
   pageCount: number;
   charCount: number;
-  pages: PageText[];
+  pages: PageWithOffset[];
+}
+
+/** Compute char offsets for an array of page texts. */
+export function attachCharOffsets(pages: ReadonlyArray<PageText>): PageWithOffset[] {
+  const out: PageWithOffset[] = [];
+  let cursor = 0;
+  for (const p of pages) {
+    out.push({ page: p.page, text: p.text, charOffset: cursor });
+    cursor += p.text.length + 1; // +1 for the join newline used downstream
+  }
+  return out;
+}
+
+/** Given a doc-wide char offset, which page contains it? Returns 1-indexed page or null. */
+export function pageForCharOffset(pages: ReadonlyArray<PageWithOffset>, offset: number): number | null {
+  for (let i = pages.length - 1; i >= 0; i--) {
+    const p = pages[i] as PageWithOffset;
+    if (offset >= p.charOffset) return p.page;
+  }
+  return null;
 }
 
 export interface PdfService {
@@ -34,31 +59,30 @@ function nativeService(): PdfService {
     async extract(uri) {
       const result = await mod.extractText(uri);
       const pages = Array.isArray(result) ? result : result.pages;
-      const out: PageText[] = pages.map((text, i) => ({ page: i + 1, text: text ?? '' }));
-      const charCount = out.reduce((acc, p) => acc + p.text.length, 0);
-      return { pageCount: out.length, charCount, pages: out };
+      const flat: PageText[] = pages.map((text, i) => ({ page: i + 1, text: text ?? '' }));
+      const withOffsets = attachCharOffsets(flat);
+      const charCount = flat.reduce((acc, p) => acc + p.text.length, 0);
+      return { pageCount: flat.length, charCount, pages: withOffsets };
     },
   };
 }
 
 function nodeStubService(): PdfService {
   const fs = require('node:fs/promises') as typeof import('node:fs/promises');
-  const path = require('node:path') as typeof import('node:path');
   return {
     async extract(uri) {
       const sidecar = uri.endsWith('.json') ? uri : `${uri}.json`;
       try {
         const raw = await fs.readFile(sidecar, 'utf8');
         const parsed = JSON.parse(raw) as { pages: string[] };
-        const pages: PageText[] = parsed.pages.map((text, i) => ({ page: i + 1, text }));
+        const flat: PageText[] = parsed.pages.map((text, i) => ({ page: i + 1, text }));
+        const withOffsets = attachCharOffsets(flat);
         return {
-          pageCount: pages.length,
-          charCount: pages.reduce((a, p) => a + p.text.length, 0),
-          pages,
+          pageCount: flat.length,
+          charCount: flat.reduce((a, p) => a + p.text.length, 0),
+          pages: withOffsets,
         };
       } catch {
-        // unknown file -> empty doc
-        void path;
         return { pageCount: 0, charCount: 0, pages: [] };
       }
     },

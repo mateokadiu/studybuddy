@@ -13,7 +13,7 @@ declare module 'react-native' {
   export interface TextStyle extends ViewStyle {}
   export interface ImageStyle extends ViewStyle {}
 
-  export type StyleProp<T> = T | T[] | null | undefined | false;
+  export type StyleProp<T> = T | (T | null | undefined | false)[] | null | undefined | false;
 
   export interface ViewProps {
     style?: StyleProp<ViewStyle>;

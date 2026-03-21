@@ -106,7 +106,25 @@ declare module 'react-native-pdf-extract';
 declare module 'react-native-gesture-handler';
 declare module 'react-native-reanimated';
 declare module '@shopify/react-native-skia';
-declare module 'expo-router';
+declare module 'expo-router' {
+  import type { ComponentType, ReactNode } from 'react';
+  type NavProps = { screenOptions?: unknown; children?: ReactNode };
+  export const Stack: ComponentType<NavProps> & {
+    Screen: ComponentType<{ name?: string; options?: unknown }>;
+  };
+  export const Tabs: ComponentType<NavProps> & {
+    Screen: ComponentType<{ name?: string; options?: unknown }>;
+  };
+  export function Link(props: { href: string; asChild?: boolean; children?: ReactNode; style?: unknown }): JSX.Element;
+  export function Redirect(props: { href: string }): null;
+  export function useRouter(): {
+    push: (href: string) => void;
+    replace: (href: string) => void;
+    back: () => void;
+  };
+  export function useLocalSearchParams<T = Record<string, string>>(): T;
+  export function useGlobalSearchParams<T = Record<string, string>>(): T;
+}
 declare module 'expo-document-picker';
 declare module 'expo-file-system';
 declare module 'expo-notifications';

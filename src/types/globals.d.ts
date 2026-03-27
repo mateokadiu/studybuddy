@@ -72,6 +72,9 @@ declare module 'react-native' {
     onRefresh?: () => void;
     contentContainerStyle?: StyleProp<ViewStyle>;
     horizontal?: boolean;
+    showsHorizontalScrollIndicator?: boolean;
+    showsVerticalScrollIndicator?: boolean;
+    extraData?: unknown;
     ItemSeparatorComponent?: ComponentType;
   }
 

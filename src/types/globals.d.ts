@@ -107,7 +107,40 @@ declare module 'react-native-mmkv';
 declare module 'react-native-quick-sqlite';
 declare module 'react-native-pdf-extract';
 declare module 'react-native-gesture-handler';
-declare module 'react-native-reanimated';
+declare module 'react-native-reanimated' {
+  import type { ComponentType, ReactNode } from 'react';
+  import type { ViewProps } from 'react-native';
+  export interface SharedValue<T> {
+    value: T;
+  }
+  export function useSharedValue<T>(initial: T): SharedValue<T>;
+  export function useAnimatedStyle<T extends object>(fn: () => T, deps?: unknown[]): T;
+  export function withTiming<T>(toValue: T, config?: { duration?: number; easing?: unknown }, callback?: (finished: boolean) => void): T;
+  export function withSpring<T>(toValue: T, config?: unknown): T;
+  export function withDelay<T>(delay: number, animation: T): T;
+  export function withSequence<T>(...animations: T[]): T;
+  export function interpolate(value: number, input: ReadonlyArray<number>, output: ReadonlyArray<number>, extrapolate?: unknown): number;
+  export function runOnJS<T extends (...a: unknown[]) => unknown>(fn: T): T;
+  export const Easing: {
+    bezier(x1: number, y1: number, x2: number, y2: number): unknown;
+    linear: unknown;
+    in(easing?: unknown): unknown;
+    out(easing?: unknown): unknown;
+    inOut(easing?: unknown): unknown;
+  };
+  const View: ComponentType<ViewProps & { children?: ReactNode }>;
+  const ScrollView: ComponentType<ViewProps & { children?: ReactNode }>;
+  const Text: ComponentType<ViewProps & { children?: ReactNode }>;
+  const Image: ComponentType<ViewProps>;
+  const Animated: {
+    View: typeof View;
+    ScrollView: typeof ScrollView;
+    Text: typeof Text;
+    Image: typeof Image;
+    createAnimatedComponent<T>(c: T): T;
+  };
+  export default Animated;
+}
 declare module '@shopify/react-native-skia';
 declare module 'expo-router' {
   import type { ComponentType, ReactNode } from 'react';

@@ -106,7 +106,23 @@ declare module 'react-native' {
 declare module 'react-native-mmkv';
 declare module 'react-native-quick-sqlite';
 declare module 'react-native-pdf-extract';
-declare module 'react-native-gesture-handler';
+declare module 'react-native-gesture-handler' {
+  import type { ComponentType, ReactNode } from 'react';
+  import type { ViewProps } from 'react-native';
+  export const GestureHandlerRootView: ComponentType<ViewProps>;
+  export const GestureDetector: ComponentType<{ gesture: unknown; children?: ReactNode }>;
+  export const Gesture: {
+    Pan(): {
+      enabled(v: boolean): ReturnType<typeof Gesture.Pan>;
+      onUpdate(fn: (e: { translationX: number; translationY: number }) => void): ReturnType<typeof Gesture.Pan>;
+      onEnd(fn: (e: { translationX: number; translationY: number }) => void): ReturnType<typeof Gesture.Pan>;
+    };
+    Tap(): {
+      onEnd(fn: () => void): ReturnType<typeof Gesture.Tap>;
+    };
+    Simultaneous<T extends unknown[]>(...gestures: T): T[0];
+  };
+}
 declare module 'react-native-reanimated' {
   import type { ComponentType, ReactNode } from 'react';
   import type { ViewProps } from 'react-native';
@@ -120,7 +136,8 @@ declare module 'react-native-reanimated' {
   export function withDelay<T>(delay: number, animation: T): T;
   export function withSequence<T>(...animations: T[]): T;
   export function interpolate(value: number, input: ReadonlyArray<number>, output: ReadonlyArray<number>, extrapolate?: unknown): number;
-  export function runOnJS<T extends (...a: unknown[]) => unknown>(fn: T): T;
+  export function runOnJS<T extends (...a: never[]) => unknown>(fn: T): T;
+  export function runOnUI<T extends (...a: never[]) => unknown>(fn: T): T;
   export const Easing: {
     bezier(x1: number, y1: number, x2: number, y2: number): unknown;
     linear: unknown;

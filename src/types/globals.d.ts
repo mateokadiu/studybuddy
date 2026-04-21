@@ -158,7 +158,45 @@ declare module 'react-native-reanimated' {
   };
   export default Animated;
 }
-declare module '@shopify/react-native-skia';
+declare module '@shopify/react-native-skia' {
+  import type { ComponentType, ReactNode } from 'react';
+  import type { ViewStyle, StyleProp } from 'react-native';
+  export const Canvas: ComponentType<{
+    style?: StyleProp<ViewStyle>;
+    children?: ReactNode;
+    onTouch?: (e: unknown) => void;
+  }>;
+  export const Group: ComponentType<{ children?: ReactNode; transform?: unknown; opacity?: number }>;
+  export const Rect: ComponentType<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    color?: string;
+    opacity?: number;
+  }>;
+  export const Circle: ComponentType<{ cx: number; cy: number; r: number; color?: string; opacity?: number; style?: 'fill' | 'stroke'; strokeWidth?: number }>;
+  export const Path: ComponentType<{
+    path: unknown;
+    color?: string;
+    style?: 'fill' | 'stroke';
+    strokeWidth?: number;
+    opacity?: number;
+  }>;
+  export const Text: ComponentType<{ x: number; y: number; text: string; font?: unknown; color?: string }>;
+  export const Line: ComponentType<{ p1: { x: number; y: number }; p2: { x: number; y: number }; color?: string; strokeWidth?: number }>;
+  export const Skia: {
+    Path: {
+      Make(): {
+        moveTo(x: number, y: number): unknown;
+        lineTo(x: number, y: number): unknown;
+        cubicTo(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): unknown;
+        close(): unknown;
+        toSVGString(): string;
+      };
+    };
+  };
+}
 declare module 'expo-router' {
   import type { ComponentType, ReactNode } from 'react';
   type NavProps = { screenOptions?: unknown; children?: ReactNode };

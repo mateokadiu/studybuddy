@@ -130,6 +130,7 @@ declare module 'react-native-reanimated' {
     value: T;
   }
   export function useSharedValue<T>(initial: T): SharedValue<T>;
+  export function useDerivedValue<T>(fn: () => T, deps?: unknown[]): SharedValue<T>;
   export function useAnimatedStyle<T extends object>(fn: () => T, deps?: unknown[]): T;
   export function withTiming<T>(toValue: T, config?: { duration?: number; easing?: unknown }, callback?: (finished: boolean) => void): T;
   export function withSpring<T>(toValue: T, config?: unknown): T;

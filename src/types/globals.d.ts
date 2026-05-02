@@ -9,6 +9,7 @@ declare module 'react-native' {
 
   export interface ViewStyle {
     [key: string]: unknown;
+    inset?: number;
   }
   export interface TextStyle extends ViewStyle {}
   export interface ImageStyle extends ViewStyle {}

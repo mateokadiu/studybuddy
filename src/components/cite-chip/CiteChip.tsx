@@ -33,7 +33,11 @@ export function CiteChip({ chunkId, page, onPress, size = 'sm' }: Props) {
       hitSlop={6}
       onPress={() => {
         if (onPress) onPress();
-        else if (resolved) router.push(`/(tabs)/library/${chunkId}` as never);
+        else if (resolved) {
+          // route to the source doc detail with the chunk id as a query
+          // param; the detail screen scrolls that chunk into view.
+          router.push(`/(tabs)/library?focusChunkId=${chunkId}` as never);
+        }
       }}
       accessibilityRole="button"
       accessibilityLabel={`source citation, page ${page}`}

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { FlatList, Pressable, Text, View, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
@@ -35,7 +35,7 @@ async function loadDocDetail(docId: string): Promise<DocDetail | null> {
 }
 
 export default function DocDetailScreen() {
-  const { docId } = useLocalSearchParams<{ docId: string }>();
+  const { docId, focusChunkId } = useLocalSearchParams<{ docId: string; focusChunkId?: string }>();
   const router = useRouter();
   const q = useQuery({
     queryKey: ['library', 'doc', docId],
@@ -47,6 +47,24 @@ export default function DocDetailScreen() {
     () => (q.data?.chunks ?? []).reduce((a, c) => a + c.tokenCount, 0),
     [q.data],
   );
+
+  // FlatList ref-based scroll-to-index when a chip routes us here
+  const listRef = useRef<{ scrollToIndex(p: { index: number; animated?: boolean }): void } | null>(null);
+  useEffect(() => {
+    if (!focusChunkId || !q.data) return;
+    const idx = q.data.chunks.findIndex((c) => c.id === focusChunkId);
+    if (idx >= 0 && listRef.current) {
+      // small delay so layout is committed first
+      const t = setTimeout(() => {
+        try {
+          listRef.current?.scrollToIndex({ index: idx, animated: true });
+        } catch {
+          // index out of range during initial render is harmless
+        }
+      }, 100);
+      return () => clearTimeout(t);
+    }
+  }, [focusChunkId, q.data]);
 
   if (q.isPending) {
     return (
@@ -73,10 +91,7 @@ export default function DocDetailScreen() {
           {doc.status} · {doc.pageCount} pp · {chunkRows.length} chunks · {Math.round(totalTokens / 1000)}k tokens
         </Text>
         <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-          <Pressable
-            style={styles.cta}
-            onPress={() => router.push(`/(tabs)/chat/${doc.id}` as never)}
-          >
+          <Pressable style={styles.cta} onPress={() => router.push(`/(tabs)/chat/${doc.id}` as never)}>
             <Text style={styles.ctaText}>chat with doc</Text>
           </Pressable>
           <Pressable
@@ -88,11 +103,12 @@ export default function DocDetailScreen() {
         </View>
       </View>
       <FlatList
+        ref={listRef as never}
         data={chunkRows}
         keyExtractor={(c) => c.id}
         contentContainerStyle={{ padding: 12, gap: 6 }}
         renderItem={({ item }) => (
-          <View style={styles.row}>
+          <View style={[styles.row, focusChunkId === item.id ? styles.rowFocused : null]}>
             <Text style={styles.rowTitle}>
               chunk {item.idx + 1} · pp.{item.pageStart}-{item.pageEnd}
             </Text>
@@ -115,6 +131,7 @@ const styles = {
   ctaOutline: { borderColor: '#7aa2ff', borderWidth: 1, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 } as const,
   ctaOutlineText: { color: '#7aa2ff', fontWeight: '600' } as const,
   row: { backgroundColor: '#1a1d23', padding: 10, borderRadius: 6 } as const,
+  rowFocused: { backgroundColor: '#1e3a5f', borderColor: '#7aa2ff', borderWidth: 1 } as const,
   rowTitle: { color: '#e6e8eb', fontSize: 14 } as const,
   rowSub: { color: '#7a818b', fontSize: 11, marginTop: 2 } as const,
 };

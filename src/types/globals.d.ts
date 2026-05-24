@@ -77,6 +77,7 @@ declare module 'react-native' {
     showsVerticalScrollIndicator?: boolean;
     extraData?: unknown;
     ItemSeparatorComponent?: ComponentType;
+    ref?: unknown;
   }
 
   export const View: ComponentType<ViewProps>;

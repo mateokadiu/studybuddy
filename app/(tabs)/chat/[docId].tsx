@@ -176,6 +176,7 @@ export default function ChatDocScreen() {
 function Bubble({ msg }: { msg: ChatMessage }) {
   const isUser = msg.role === 'user';
   const cites = msg.cites ? (JSON.parse(msg.cites) as Array<{ chunkId: string; page: number }>) : [];
+  const showUsage = !isUser && (msg.tokensIn != null || msg.tokensOut != null);
   return (
     <View style={[styles.bubble, isUser ? styles.userBubble : styles.botBubble]}>
       <Text style={styles.bubbleText}>{msg.content}</Text>
@@ -184,6 +185,13 @@ function Bubble({ msg }: { msg: ChatMessage }) {
           {cites.map((c, i) => (
             <CiteChip key={`${c.chunkId}-${c.page}-${i}`} chunkId={c.chunkId} page={c.page} />
           ))}
+        </View>
+      ) : null}
+      {showUsage ? (
+        <View style={styles.usage}>
+          <Text style={styles.usageText}>
+            in {msg.tokensIn ?? 0} · out {msg.tokensOut ?? 0}
+          </Text>
         </View>
       ) : null}
     </View>
@@ -201,4 +209,6 @@ const styles = {
   botBubble: { backgroundColor: '#1a1d23', alignSelf: 'flex-start' } as const,
   bubbleText: { color: '#e6e8eb', fontSize: 14 } as const,
   citeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 6 } as const,
+  usage: { marginTop: 4, alignSelf: 'flex-end' } as const,
+  usageText: { color: '#7a818b', fontSize: 10 } as const,
 };

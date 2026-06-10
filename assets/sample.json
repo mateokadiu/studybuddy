@@ -1,0 +1,10 @@
+{
+  "title": "Sample: Spaced Repetition — A Short Primer",
+  "source": "compiled from open material, public domain",
+  "pages": [
+    "Spaced Repetition\n\nSpaced repetition is a learning technique in which review of material is spaced out over increasing intervals of time. The technique exploits the spacing effect: information is retained more durably when study sessions are distributed across time rather than massed into a single session.\n\nThe modern formulation traces to Hermann Ebbinghaus, whose 1885 forgetting-curve experiments quantified the rate at which freshly learned material decays without review.",
+    "The Forgetting Curve\n\nEbbinghaus measured his own ability to recall lists of nonsense syllables over time. He found that retention drops sharply within the first few hours and then more slowly thereafter. The shape of the curve is approximately exponential.\n\nThe practical consequence: a single study session is the worst possible schedule. Re-exposure at planned intervals — minutes, hours, days, weeks — interrupts decay and gradually flattens the curve.",
+    "Algorithms\n\nSeveral algorithms operationalize spaced repetition. SuperMemo's SM-2 (1987) was the first widely adopted. Anki's default until 2023 was a modified SM-2. The Free Spaced Repetition Scheduler (FSRS) replaced SM-2 in Anki 23.10 and uses a three-component model of memory: stability, difficulty, and retrievability.\n\nFSRS-4.5 weights are tuned against a large open dataset of real review logs and can be re-fit per user once enough reviews exist.",
+    "Retrievability\n\nRetrievability R(t, S) is modeled as a power-function decay of elapsed time t scaled by stability S. The textbook FSRS form is R = (1 + t / (9 S))^-1, with the 0.9 default target retention determining how aggressive the next interval is.\n\nIf the user successfully recalls a card, stability increases; the next interval grows. If recall fails, stability collapses and the card returns to the learning queue."
+  ]
+}

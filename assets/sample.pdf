@@ -1,0 +1,5 @@
+%PDF-1.4
+% placeholder bundled sample pdf — the real binary ships in the published app.
+% on-device, react-native-pdf-extract reads the actual pdf; in the test/node
+% path the sibling sample.json sidecar provides the page text.
+%%EOF

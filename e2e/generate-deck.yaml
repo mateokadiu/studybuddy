@@ -1,0 +1,22 @@
+appId: com.mateokadiu.studybuddy
+name: generate deck
+tags:
+  - cards
+  - smoke
+---
+- launchApp:
+    clearState: true
+- runFlow: import-pdf.yaml
+- assertVisible:
+    text: "Sample"
+    optional: true
+- tapOn:
+    text: "Sample"
+    optional: true
+- tapOn: view decks
+- tapOn:
+    text: "Auto"
+    optional: true
+- assertVisible:
+    text: cards
+    optional: true

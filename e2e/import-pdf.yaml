@@ -1,0 +1,21 @@
+appId: com.mateokadiu.studybuddy
+name: import pdf
+tags:
+  - ingest
+  - smoke
+---
+- launchApp:
+    clearState: true
+- assertVisible: studybuddy
+- tapOn: continue
+- tapOn: continue
+- tapOn: skip — open library
+- assertVisible: your library is empty
+- tapOn: import a pdf
+- tapOn: pick pdf
+# the document picker is system UI; maestro can only continue if a
+# pre-selected fixture is provided via maestro env. for the smoke flow we
+# stop after the picker opens.
+- assertVisible:
+    text: opening picker
+    optional: true

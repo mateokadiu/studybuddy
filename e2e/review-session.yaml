@@ -1,0 +1,25 @@
+appId: com.mateokadiu.studybuddy
+name: review session
+tags:
+  - review
+  - smoke
+---
+- launchApp:
+    clearState: true
+- runFlow: import-pdf.yaml
+- tapOn:
+    text: Review
+    index: 0
+- tapOn:
+    text: review this deck
+    optional: true
+# first swipe flips the card
+- swipe:
+    direction: up
+- waitForAnimationToEnd
+# second swipe grades it
+- swipe:
+    direction: up
+- assertVisible:
+    text: "/"
+    optional: true

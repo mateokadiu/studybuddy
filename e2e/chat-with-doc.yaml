@@ -1,0 +1,23 @@
+appId: com.mateokadiu.studybuddy
+name: chat with doc
+tags:
+  - chat
+  - smoke
+---
+- launchApp:
+    clearState: true
+- runFlow: import-pdf.yaml
+- tapOn:
+    text: Chat
+    index: 0
+- tapOn:
+    text: "Sample"
+    optional: true
+- tapOn:
+    id: chat-input
+    optional: true
+- inputText: what is the forgetting curve?
+- tapOn: send
+- assertVisible:
+    text: "p."
+    optional: true

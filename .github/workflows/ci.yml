@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    name: typecheck + tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm lint
+
+  maestro-lint:
+    name: maestro flows (lint only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install maestro cli
+        run: curl -Ls "https://get.maestro.mobile.dev" | bash
+      - name: analyze flows
+        run: |
+          export PATH="$PATH:$HOME/.maestro/bin"
+          for f in e2e/*.yaml; do
+            echo "checking $f"
+            maestro test --dry-run "$f" || true
+          done

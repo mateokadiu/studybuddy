@@ -108,6 +108,25 @@ request for size, then a resumable download from Hugging Face, then a
 SHA-256 verify. Source URLs and hashes live in `src/services/models.service.ts`
 and `docs/MODELS.md`.
 
+## Roadmap (v0.2)
+
+These are explicit non-goals for v0.1 — landing in v0.2.
+
+- **Custom TurboModule PDF parsers** wrapping PDFKit (iOS) and PdfBox
+  (Android) for messy real-world PDFs that `react-native-pdf-extract`
+  doesn't handle well.
+- **OCR fallback** for scanned PDFs (Vision framework on iOS, ML Kit on
+  Android).
+- **EPUB import**.
+- **Voice chat with the doc** via Whisper + an on-device TTS.
+- **Image-bearing cards** for diagrams.
+- **Tailscale-mediated sync** between phone and desktop — never via a
+  third-party server.
+- **Per-user FSRS optimization** — the optimize() stub already shipped in
+  `lib/fsrs.ts` reports log-loss; the L-BFGS-B fitting follows once a
+  user has 1000+ reviews logged.
+- **Multi-doc decks** ("everything I read about kubernetes").
+
 ## License
 
 MIT. Models retain their own licenses (Llama Community, Apache 2.0,

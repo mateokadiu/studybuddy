@@ -1,5 +1,5 @@
-import { create } from 'zustand';
 import type { ChatTurn } from '@/types/chat';
+import { create } from 'zustand';
 
 interface ChatStore {
   /** active in-flight stream, keyed by chatId */
@@ -18,8 +18,7 @@ export const useChat = create<ChatStore>((set) => ({
   streaming: {},
   drafts: {},
 
-  setDraft: (chatId, text) =>
-    set((s) => ({ drafts: { ...s.drafts, [chatId]: text } })),
+  setDraft: (chatId, text) => set((s) => ({ drafts: { ...s.drafts, [chatId]: text } })),
   startStream: (chatId, tokensIn) =>
     set((s) => ({
       streaming: { ...s.streaming, [chatId]: { partial: '', tokensIn, tokensOut: 0 } },

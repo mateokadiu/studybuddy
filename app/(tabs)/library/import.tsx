@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { Pressable, Text, View, TextInput, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { id as uuid } from '@/lib/id';
 import { getDb } from '@/db/client';
 import { documents } from '@/db/schema';
+import { id as uuid } from '@/lib/id';
+import { ingestPastedText, ingestPdf } from '@/services/ingest';
 import { useLibrary as useLibraryStore } from '@/stores/library.store';
-import { ingestPdf, ingestPastedText } from '@/services/ingest';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Alert, Pressable, Text, TextInput, View } from 'react-native';
 
 type Mode = 'pick' | 'paste';
 
@@ -24,9 +24,15 @@ export default function ImportScreen() {
         getDocumentAsync(opts: {
           type?: string | string[];
           copyToCacheDirectory?: boolean;
-        }): Promise<{ canceled: boolean; assets?: Array<{ uri: string; name: string; size?: number }> }>;
+        }): Promise<{
+          canceled: boolean;
+          assets?: Array<{ uri: string; name: string; size?: number }>;
+        }>;
       };
-      const res = await picker.getDocumentAsync({ type: 'application/pdf', copyToCacheDirectory: true });
+      const res = await picker.getDocumentAsync({
+        type: 'application/pdf',
+        copyToCacheDirectory: true,
+      });
       if (res.canceled || !res.assets?.[0]) return null;
       const asset = res.assets[0];
       const docId = uuid();
@@ -58,7 +64,10 @@ export default function ImportScreen() {
       if (pasteText.trim().length === 0) throw new Error('paste some text first');
       const docId = uuid();
       const db = getDb();
-      const title = pasteTitle.trim().length > 0 ? pasteTitle.trim() : `paste ${new Date().toISOString().slice(0, 10)}`;
+      const title =
+        pasteTitle.trim().length > 0
+          ? pasteTitle.trim()
+          : `paste ${new Date().toISOString().slice(0, 10)}`;
       await db.insert(documents).values({
         id: docId,
         title,
@@ -121,12 +130,13 @@ export default function ImportScreen() {
   );
 }
 
-function ModeChip({ active, label, onPress }: { active: boolean; label: string; onPress: () => void }) {
+function ModeChip({
+  active,
+  label,
+  onPress,
+}: { active: boolean; label: string; onPress: () => void }) {
   return (
-    <Pressable
-      style={[styles.chip, active ? styles.chipActive : null]}
-      onPress={onPress}
-    >
+    <Pressable style={[styles.chip, active ? styles.chipActive : null]} onPress={onPress}>
       <Text style={active ? styles.chipTextActive : styles.chipText}>{label}</Text>
     </Pressable>
   );

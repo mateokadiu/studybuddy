@@ -10,12 +10,12 @@
  *      until the stream finishes or is explicitly cancelled)
  */
 
-import { useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { asc, eq, desc } from 'drizzle-orm';
 import { getDb } from '@/db/client';
-import { chatMessages, chats, type ChatMessage } from '@/db/schema';
+import { type ChatMessage, chatMessages, chats } from '@/db/schema';
 import { useChat } from '@/stores/chat.store';
+import { useQuery } from '@tanstack/react-query';
+import { asc, desc, eq } from 'drizzle-orm';
+import { useEffect } from 'react';
 
 async function loadChat(chatId: string): Promise<ChatMessage[]> {
   const db = getDb();
@@ -56,7 +56,9 @@ export function useRecentChats(limit?: number) {
  * current screen — calling abort if the screen unmounts before the stream
  * finishes is the consumer's job; this is just the resume side.
  */
-export function useResumeStream(chatId: string | null): { partial: string; tokensOut: number } | null {
+export function useResumeStream(
+  chatId: string | null,
+): { partial: string; tokensOut: number } | null {
   const streaming = useChat((s) => (chatId ? s.streaming[chatId] : undefined));
   // tiny side effect just so consumers don't accidentally drop the dep
   useEffect(() => {

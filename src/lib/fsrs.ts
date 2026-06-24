@@ -92,7 +92,7 @@ function forgettingCurve(elapsedDays: number, stability: number): number {
 /** Compute the next interval that yields the requested retention. */
 function nextInterval(stability: number, requestRetention: number, max: number): number {
   if (stability <= 0) return 0;
-  const i = (9 * stability * (1 / requestRetention - 1));
+  const i = 9 * stability * (1 / requestRetention - 1);
   return clamp(Math.round(i), 1, max);
 }
 
@@ -120,13 +120,7 @@ function shortTermStability(w: number[], s: number, rating: FsrsRating): number 
   return Math.max(s * factor, 0.1);
 }
 
-function recallStability(
-  w: number[],
-  d: number,
-  s: number,
-  r: number,
-  rating: FsrsRating,
-): number {
+function recallStability(w: number[], d: number, s: number, r: number, rating: FsrsRating): number {
   const hardPenalty = rating === 2 ? (w[15] as number) : 1;
   const easyBonus = rating === 4 ? (w[16] as number) : 1;
   const factor =
@@ -159,7 +153,12 @@ function fuzz(interval: number, cfg: FsrsConfig): number {
 /**
  * Run one review. Returns the updated card. `now` is ms-since-epoch.
  */
-export function schedule(card: FsrsCard, rating: FsrsRating, now: number, cfg?: Partial<FsrsConfig>): FsrsCard {
+export function schedule(
+  card: FsrsCard,
+  rating: FsrsRating,
+  now: number,
+  cfg?: Partial<FsrsConfig>,
+): FsrsCard {
   const c: FsrsConfig = { ...defaultConfig(), ...cfg };
   const w = c.w;
 

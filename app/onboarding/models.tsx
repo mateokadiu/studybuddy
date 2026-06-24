@@ -1,6 +1,6 @@
-import { Pressable, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useSettings } from '@/stores/settings.store';
+import { useRouter } from 'expo-router';
+import { Pressable, Text, View } from 'react-native';
 
 export default function OnboardingModels() {
   const router = useRouter();
@@ -9,21 +9,16 @@ export default function OnboardingModels() {
   return (
     <View style={styles.host}>
       <Text style={styles.h2}>models</Text>
-      <Text style={styles.body}>
-        studybuddy uses two on-device models:
-      </Text>
+      <Text style={styles.body}>studybuddy uses two on-device models:</Text>
       <View style={{ gap: 8 }}>
         <Bullet text="Llama 3.2 3B (4-bit) — generates flashcards + chat answers (~2.5 GB)" />
         <Bullet text="MiniLM-L6 — embeds chunks for retrieval (~25 MB)" />
       </View>
       <Text style={styles.muted}>
-        downloaded once on first launch. stored under your app sandbox. you can swap
-        for Phi-3.5, Gemma 2, or Llama 1B later in settings.
+        downloaded once on first launch. stored under your app sandbox. you can swap for Phi-3.5,
+        Gemma 2, or Llama 1B later in settings.
       </Text>
-      <Pressable
-        style={styles.toggle}
-        onPress={() => setWifi(!wifiOnly)}
-      >
+      <Pressable style={styles.toggle} onPress={() => setWifi(!wifiOnly)}>
         <Text style={styles.toggleText}>wifi-only downloads: {wifiOnly ? 'on' : 'off'}</Text>
       </Pressable>
       <View style={{ flex: 1 }} />
@@ -50,6 +45,11 @@ const styles = {
   muted: { color: '#7a818b', fontSize: 13 } as const,
   toggle: { backgroundColor: '#1a1d23', padding: 12, borderRadius: 8 } as const,
   toggleText: { color: '#e6e8eb' } as const,
-  cta: { backgroundColor: '#7aa2ff', paddingVertical: 14, borderRadius: 8, alignItems: 'center' } as const,
+  cta: {
+    backgroundColor: '#7aa2ff',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  } as const,
   ctaText: { color: '#0f1115', fontWeight: '700' } as const,
 };

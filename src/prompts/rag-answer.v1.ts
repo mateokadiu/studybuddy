@@ -35,15 +35,10 @@ export interface RagPromptArgs {
 
 export function buildRagPrompt(args: RagPromptArgs): string {
   const passages = args.retrieved
-    .map(
-      (c, i) =>
-        `[Passage ${i + 1} — pp. ${c.pageStart}-${c.pageEnd}]\n${c.text}`,
-    )
+    .map((c, i) => `[Passage ${i + 1} — pp. ${c.pageStart}-${c.pageEnd}]\n${c.text}`)
     .join('\n\n');
 
-  const transcript = args.history
-    .map((m) => `${m.role.toUpperCase()}: ${m.content}`)
-    .join('\n\n');
+  const transcript = args.history.map((m) => `${m.role.toUpperCase()}: ${m.content}`).join('\n\n');
 
   return `${SYSTEM}
 

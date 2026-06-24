@@ -23,8 +23,14 @@ export function useReviewShortcuts({ onGrade, onFlip, active }: Handlers): void 
     if (!active) return;
     if (typeof globalThis === 'undefined') return;
     const g = globalThis as {
-      addEventListener?: (event: string, fn: (e: { key?: string; code?: string; preventDefault?: () => void }) => void) => void;
-      removeEventListener?: (event: string, fn: (e: { key?: string; code?: string; preventDefault?: () => void }) => void) => void;
+      addEventListener?: (
+        event: string,
+        fn: (e: { key?: string; code?: string; preventDefault?: () => void }) => void,
+      ) => void;
+      removeEventListener?: (
+        event: string,
+        fn: (e: { key?: string; code?: string; preventDefault?: () => void }) => void,
+      ) => void;
     };
     if (!g.addEventListener || !g.removeEventListener) return;
 

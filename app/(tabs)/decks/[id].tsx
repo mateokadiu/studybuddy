@@ -1,10 +1,10 @@
-import { FlatList, Pressable, Text, View, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { getDb } from '@/db/client';
+import { type Card, type Deck, cards, decks } from '@/db/schema';
+import { useDeckStore } from '@/stores/deck.store';
 import { useQuery } from '@tanstack/react-query';
 import { asc, eq } from 'drizzle-orm';
-import { getDb } from '@/db/client';
-import { cards, decks, type Card, type Deck } from '@/db/schema';
-import { useDeckStore } from '@/stores/deck.store';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 
 interface DeckDetail {
   deck: Deck;
@@ -122,7 +122,13 @@ const styles = {
   } as const,
   ctaText: { color: '#0f1115', fontWeight: '600' } as const,
   row: { backgroundColor: '#1a1d23', padding: 12, borderRadius: 8, gap: 4 } as const,
-  typeBadge: { alignSelf: 'flex-start', backgroundColor: '#0f1115', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 } as const,
+  typeBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#0f1115',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  } as const,
   typeBadgeText: { color: '#7aa2ff', fontSize: 10, textTransform: 'uppercase' } as const,
   front: { color: '#e6e8eb', fontSize: 15, fontWeight: '600' } as const,
   back: { color: '#9aa0a8', fontSize: 13 } as const,

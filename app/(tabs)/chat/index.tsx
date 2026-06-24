@@ -1,10 +1,10 @@
-import { FlatList, Pressable, Text, View, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { desc, eq } from 'drizzle-orm';
 import { getDb } from '@/db/client';
-import { chats, documents, type Chat } from '@/db/schema';
+import { type Chat, chats, documents } from '@/db/schema';
 import { id as uuid } from '@/lib/id';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { desc, eq } from 'drizzle-orm';
+import { useRouter } from 'expo-router';
+import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 
 interface ChatRow extends Chat {
   docTitle: string | null;
@@ -120,7 +120,12 @@ const styles = {
   muted: { color: '#7a818b' } as const,
   section: { padding: 12, borderBottomColor: '#1f2329', borderBottomWidth: 1, gap: 8 } as const,
   sectionTitle: { color: '#7a818b', fontSize: 12 } as const,
-  docChip: { paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#1a1d23', borderRadius: 16 } as const,
+  docChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#1a1d23',
+    borderRadius: 16,
+  } as const,
   docChipText: { color: '#e6e8eb', fontSize: 13 } as const,
   row: { backgroundColor: '#1a1d23', padding: 12, borderRadius: 8 } as const,
   title: { color: '#e6e8eb', fontSize: 16, fontWeight: '600' } as const,

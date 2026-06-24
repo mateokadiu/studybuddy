@@ -9,15 +9,15 @@
  * progress bar per doc.
  */
 
-import { eq } from 'drizzle-orm';
 import { getDb } from '@/db/client';
 import { chunks as chunksTable, documents } from '@/db/schema';
+import { type PageText, chunkByTokens } from '@/lib/chunker';
 import { id as uuid } from '@/lib/id';
-import { chunkByTokens, type PageText } from '@/lib/chunker';
-import { getPdfService } from '@/services/pdf.service';
 import { embedAllChunked, getEmbedService } from '@/services/embed.service';
+import { getPdfService } from '@/services/pdf.service';
 import { packEmbedding } from '@/services/vector-store';
 import { useLibrary } from '@/stores/library.store';
+import { eq } from 'drizzle-orm';
 
 /** Drive the four-stage pipeline for a freshly inserted documents row. */
 export async function ingestPdf(docId: string, uri: string): Promise<void> {
@@ -87,7 +87,12 @@ async function pipeline(docId: string, pages: PageText[]): Promise<void> {
   }
 
   // embed
-  lib.setIngest(docId, { stage: 'embedding', ratio: 0.15, stageDone: 0, stageTotal: rawChunks.length });
+  lib.setIngest(docId, {
+    stage: 'embedding',
+    ratio: 0.15,
+    stageDone: 0,
+    stageTotal: rawChunks.length,
+  });
   const svc = getEmbedService();
   const texts = rawChunks.map((c) => c.text);
   const embeds = await embedAllChunked(svc, texts, (done, total) => {

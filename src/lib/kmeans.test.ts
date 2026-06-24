@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { kmeans } from './kmeans';
 
 function f32(...v: number[]): Float32Array {
@@ -8,14 +8,7 @@ function f32(...v: number[]): Float32Array {
 describe('kmeans', () => {
   it('splits two well-separated clusters', () => {
     // 6 points near (0,0) and (10,10)
-    const data = f32(
-      0, 0,
-      0.1, 0,
-      0, 0.1,
-      10, 10,
-      10.1, 10,
-      10, 10.1,
-    );
+    const data = f32(0, 0, 0.1, 0, 0, 0.1, 10, 10, 10.1, 10, 10, 10.1);
     const { assignments, medoids, iters } = kmeans(data, 2, { k: 2, seed: 7 });
     // both halves should agree internally
     const a = assignments[0]!;

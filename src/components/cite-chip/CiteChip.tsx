@@ -1,5 +1,5 @@
-import { Pressable, Text } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Pressable, Text } from 'react-native';
 
 interface Props {
   /** chunk id this citation maps to, or '' if the cite is unresolved */
@@ -25,9 +25,10 @@ interface Props {
 export function CiteChip({ chunkId, page, onPress, size = 'sm' }: Props) {
   const router = useRouter();
   const resolved = chunkId.length > 0;
-  const dims = size === 'sm'
-    ? { paddingHorizontal: 8, paddingVertical: 2, fontSize: 11, borderRadius: 12 }
-    : { paddingHorizontal: 10, paddingVertical: 4, fontSize: 13, borderRadius: 14 };
+  const dims =
+    size === 'sm'
+      ? { paddingHorizontal: 8, paddingVertical: 2, fontSize: 11, borderRadius: 12 }
+      : { paddingHorizontal: 10, paddingVertical: 4, fontSize: 13, borderRadius: 14 };
   return (
     <Pressable
       hitSlop={6}

@@ -10,12 +10,12 @@
  *      Citation[] for the UI to render as tappable chips
  */
 
-import { getEmbedService } from './embed.service';
-import { topKForDoc } from './vector-store';
-import { getLlmService } from './llm.service';
-import { buildRagPrompt, RAG_PROMPT_VERSION } from '@/prompts/rag-answer.v1';
-import type { RetrievedChunk } from '@/types/chunk';
+import { RAG_PROMPT_VERSION, buildRagPrompt } from '@/prompts/rag-answer.v1';
 import type { Citation } from '@/types/chat';
+import type { RetrievedChunk } from '@/types/chunk';
+import { getEmbedService } from './embed.service';
+import { getLlmService } from './llm.service';
+import { topKForDoc } from './vector-store';
 
 export interface RagRetrievalOptions {
   k?: number;

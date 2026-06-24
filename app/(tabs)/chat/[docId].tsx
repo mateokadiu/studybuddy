@@ -1,14 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { CiteChip } from '@/components/cite-chip/CiteChip';
+import { getDb } from '@/db/client';
+import { type ChatMessage, chatMessages, chats } from '@/db/schema';
+import { id as uuid } from '@/lib/id';
+import { answer } from '@/services/rag.service';
+import { useChat } from '@/stores/chat.store';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { asc, eq } from 'drizzle-orm';
-import { getDb } from '@/db/client';
-import { chatMessages, chats, type ChatMessage } from '@/db/schema';
-import { id as uuid } from '@/lib/id';
-import { useChat } from '@/stores/chat.store';
-import { answer } from '@/services/rag.service';
-import { CiteChip } from '@/components/cite-chip/CiteChip';
+import { useLocalSearchParams } from 'expo-router';
+import { useCallback, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 async function loadChat(chatId: string): Promise<ChatMessage[]> {
   const db = getDb();
@@ -59,7 +68,10 @@ export default function ChatDocScreen() {
     });
 
     // set chat title to first user msg if still default
-    const titleRows = (await db.select().from(chats).where(eq(chats.id, chatId as string))) as Array<{
+    const titleRows = (await db
+      .select()
+      .from(chats)
+      .where(eq(chats.id, chatId as string))) as Array<{
       title: string;
     }>;
     if (titleRows[0]?.title === 'new chat') {
@@ -118,10 +130,6 @@ export default function ChatDocScreen() {
     finishStream,
   ]);
 
-  useEffect(() => {
-    void listRef.current;
-  }, [q.data]);
-
   if (q.isPending) {
     return (
       <View style={styles.center}>
@@ -131,7 +139,10 @@ export default function ChatDocScreen() {
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <FlatList
         data={[
           ...(q.data ?? []),
@@ -175,7 +186,9 @@ export default function ChatDocScreen() {
 
 function Bubble({ msg }: { msg: ChatMessage }) {
   const isUser = msg.role === 'user';
-  const cites = msg.cites ? (JSON.parse(msg.cites) as Array<{ chunkId: string; page: number }>) : [];
+  const cites = msg.cites
+    ? (JSON.parse(msg.cites) as Array<{ chunkId: string; page: number }>)
+    : [];
   const showUsage = !isUser && (msg.tokensIn != null || msg.tokensOut != null);
   return (
     <View style={[styles.bubble, isUser ? styles.userBubble : styles.botBubble]}>
@@ -200,9 +213,29 @@ function Bubble({ msg }: { msg: ChatMessage }) {
 
 const styles = {
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' } as const,
-  inputRow: { flexDirection: 'row', padding: 8, gap: 8, borderTopColor: '#1f2329', borderTopWidth: 1 } as const,
-  input: { flex: 1, backgroundColor: '#1a1d23', color: '#e6e8eb', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10 } as const,
-  send: { backgroundColor: '#7aa2ff', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 8, alignItems: 'center', justifyContent: 'center' } as const,
+  inputRow: {
+    flexDirection: 'row',
+    padding: 8,
+    gap: 8,
+    borderTopColor: '#1f2329',
+    borderTopWidth: 1,
+  } as const,
+  input: {
+    flex: 1,
+    backgroundColor: '#1a1d23',
+    color: '#e6e8eb',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  } as const,
+  send: {
+    backgroundColor: '#7aa2ff',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  } as const,
   sendText: { color: '#0f1115', fontWeight: '600' } as const,
   bubble: { padding: 10, borderRadius: 10, maxWidth: '90%' } as const,
   userBubble: { backgroundColor: '#7aa2ff', alignSelf: 'flex-end' } as const,

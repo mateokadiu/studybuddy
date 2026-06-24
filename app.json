@@ -20,11 +20,7 @@
     "web": {
       "bundler": "metro"
     },
-    "plugins": [
-      "expo-router",
-      "expo-document-picker",
-      "expo-notifications"
-    ],
+    "plugins": ["expo-router", "expo-document-picker", "expo-notifications"],
     "experiments": {
       "typedRoutes": true
     }

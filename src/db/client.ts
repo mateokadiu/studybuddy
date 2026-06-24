@@ -45,7 +45,10 @@ function loadDriver(): SqlDriver {
   // dynamic require so node doesn't try to resolve the native module
   const mod = require('react-native-quick-sqlite') as {
     open: (cfg: { name: string }) => {
-      executeAsync: (sql: string, params?: unknown[]) => Promise<{ rows?: { _array: SqlRow[] }; rowsAffected?: number; insertId?: number }>;
+      executeAsync: (
+        sql: string,
+        params?: unknown[],
+      ) => Promise<{ rows?: { _array: SqlRow[] }; rowsAffected?: number; insertId?: number }>;
       executeBatchAsync: (cmds: { sql: string; args?: unknown[] }[]) => Promise<void>;
     };
   };

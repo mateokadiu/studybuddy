@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { getLlmService, mockCardsJson } from './llm.service';
 import { generatedCardsSchema } from '@/types/card';
+import { describe, expect, it } from 'vitest';
+import { getLlmService, mockCardsJson } from './llm.service';
 
 describe('llm service (mock)', () => {
   it('detects the card-gen prompt and returns valid json', async () => {

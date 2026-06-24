@@ -35,7 +35,10 @@ export function attachCharOffsets(pages: ReadonlyArray<PageText>): PageWithOffse
 }
 
 /** Given a doc-wide char offset, which page contains it? Returns 1-indexed page or null. */
-export function pageForCharOffset(pages: ReadonlyArray<PageWithOffset>, offset: number): number | null {
+export function pageForCharOffset(
+  pages: ReadonlyArray<PageWithOffset>,
+  offset: number,
+): number | null {
   for (let i = pages.length - 1; i >= 0; i--) {
     const p = pages[i] as PageWithOffset;
     if (offset >= p.charOffset) return p.page;

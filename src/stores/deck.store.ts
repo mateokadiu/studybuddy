@@ -28,7 +28,10 @@ export const useDeckStore = create<DeckStore>((set) => ({
 
   startGen: (deckId, docId, target) =>
     set((s) => ({
-      gens: { ...s.gens, [deckId]: { deckId, docId, count: 0, target, duplicates: 0, done: false } },
+      gens: {
+        ...s.gens,
+        [deckId]: { deckId, docId, count: 0, target, duplicates: 0, done: false },
+      },
     })),
   tickGen: (deckId, p) =>
     set((s) => {

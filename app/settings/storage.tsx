@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { FlatList, Pressable, Text, View, ActivityIndicator, Alert } from 'react-native';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { sql } from 'drizzle-orm';
 import { getDb } from '@/db/client';
 import { cards, chatMessages, chunks, decks, documents, reviews } from '@/db/schema';
 import { kvClearAll } from '@/lib/mmkv';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { sql } from 'drizzle-orm';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, Pressable, Text, View } from 'react-native';
 
 interface DocBreakdown {
   id: string;
@@ -18,7 +18,11 @@ async function loadBreakdown(): Promise<DocBreakdown[]> {
   const db = getDb();
   // chunks
   const chunkRows = (await db
-    .select({ docId: chunks.docId, n: sql<number>`count(*)`, charSum: sql<number>`coalesce(sum(length(text)), 0)` })
+    .select({
+      docId: chunks.docId,
+      n: sql<number>`count(*)`,
+      charSum: sql<number>`coalesce(sum(length(text)), 0)`,
+    })
     .from(chunks)
     .groupBy(chunks.docId)) as Array<{ docId: string; n: number; charSum: number }>;
   const cardCounts = (await db
@@ -73,7 +77,11 @@ export default function StorageScreen() {
   };
 
   if (q.isPending) {
-    return <View style={styles.center}><ActivityIndicator /></View>;
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator />
+      </View>
+    );
   }
 
   const total = (q.data ?? []).reduce((a, d) => a + d.estimateBytes, 0);
@@ -91,9 +99,12 @@ export default function StorageScreen() {
         contentContainerStyle={{ padding: 12, gap: 8 }}
         renderItem={({ item }) => (
           <View style={styles.row}>
-            <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
+            <Text style={styles.title} numberOfLines={1}>
+              {item.title}
+            </Text>
             <Text style={styles.sub}>
-              {item.chunkCount} chunks · {item.cardCount} cards · {(item.estimateBytes / 1_000_000).toFixed(1)} MB
+              {item.chunkCount} chunks · {item.cardCount} cards ·{' '}
+              {(item.estimateBytes / 1_000_000).toFixed(1)} MB
             </Text>
           </View>
         )}
@@ -131,7 +142,12 @@ export default function StorageScreen() {
 
 const styles = {
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' } as const,
-  summary: { padding: 16, alignItems: 'center', borderBottomColor: '#1f2329', borderBottomWidth: 1 } as const,
+  summary: {
+    padding: 16,
+    alignItems: 'center',
+    borderBottomColor: '#1f2329',
+    borderBottomWidth: 1,
+  } as const,
   summaryNum: { color: '#e6e8eb', fontSize: 28, fontWeight: '700' } as const,
   summaryLabel: { color: '#7a818b', fontSize: 12, marginTop: 4 } as const,
   row: { backgroundColor: '#1a1d23', padding: 10, borderRadius: 6 } as const,
@@ -140,6 +156,12 @@ const styles = {
   danger: { padding: 16, borderTopColor: '#1f2329', borderTopWidth: 1, gap: 8 } as const,
   dangerTitle: { color: '#ff7a7a', fontSize: 14, fontWeight: '700' } as const,
   dangerSub: { color: '#7a818b', fontSize: 12 } as const,
-  dangerBtn: { borderColor: '#ff7a7a', borderWidth: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center' } as const,
+  dangerBtn: {
+    borderColor: '#ff7a7a',
+    borderWidth: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  } as const,
   dangerBtnText: { color: '#ff7a7a', fontWeight: '600' } as const,
 };

@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real, blob, index } from 'drizzle-orm/sqlite-core';
+import { blob, index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 /**
  * documents

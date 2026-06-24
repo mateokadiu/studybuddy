@@ -1,5 +1,5 @@
-import { Canvas, Path, Skia, Line } from '@shopify/react-native-skia';
-import { View, Text } from 'react-native';
+import { Canvas, Line, Path, Skia } from '@shopify/react-native-skia';
+import { Text, View } from 'react-native';
 
 export interface RetentionPoint {
   /** days from now (0 = today). Negative = past, positive = forecast. */
@@ -64,7 +64,12 @@ export function RetentionCurve({ points, width, height = 140 }: Props) {
         <Path path={fillPath} color="#1e3a5f" opacity={0.6} />
         <Path path={strokePath} color="#7aa2ff" style="stroke" strokeWidth={2} />
         {nowX >= 0 && nowX <= width ? (
-          <Line p1={{ x: nowX, y: 0 }} p2={{ x: nowX, y: height }} color="#7a818b" strokeWidth={1} />
+          <Line
+            p1={{ x: nowX, y: 0 }}
+            p2={{ x: nowX, y: height }}
+            color="#7a818b"
+            strokeWidth={1}
+          />
         ) : null}
       </Canvas>
     </View>

@@ -1,13 +1,13 @@
-import { useMemo } from 'react';
-import { Dimensions, Pressable, Text, View, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
+import { RetentionCurve, type RetentionPoint } from '@/components/retention-curve/RetentionCurve';
+import { getDb } from '@/db/client';
+import { type Card, cards } from '@/db/schema';
+import { retrievability } from '@/lib/fsrs';
+import { useReview } from '@/stores/review.store';
 import { useQuery } from '@tanstack/react-query';
 import { sql } from 'drizzle-orm';
-import { getDb } from '@/db/client';
-import { cards, type Card } from '@/db/schema';
-import { useReview } from '@/stores/review.store';
-import { RetentionCurve, type RetentionPoint } from '@/components/retention-curve/RetentionCurve';
-import { retrievability } from '@/lib/fsrs';
+import { useRouter } from 'expo-router';
+import { useMemo } from 'react';
+import { ActivityIndicator, Dimensions, Pressable, Text, View } from 'react-native';
 
 async function loadAllCards(): Promise<Card[]> {
   const db = getDb();
@@ -80,17 +80,13 @@ export default function ReviewDoneScreen() {
       ) : null}
 
       <Text style={styles.section}>retention forecast (next 60 days)</Text>
-      {cardsQ.isPending ? (
-        <ActivityIndicator />
-      ) : (
-        <RetentionCurve points={points} width={width} />
-      )}
+      {cardsQ.isPending ? <ActivityIndicator /> : <RetentionCurve points={points} width={width} />}
 
       <Pressable
         style={styles.cta}
         onPress={() => {
           abort();
-          router.replace(`/(tabs)/review` as never);
+          router.replace('/(tabs)/review' as never);
         }}
       >
         <Text style={styles.ctaText}>done</Text>
@@ -112,7 +108,13 @@ const styles = {
   title: { color: '#e6e8eb', fontSize: 22, fontWeight: '700' } as const,
   section: { color: '#7a818b', fontSize: 12, marginTop: 8 } as const,
   statsRow: { flexDirection: 'row', gap: 8 } as const,
-  stat: { backgroundColor: '#1a1d23', padding: 10, borderRadius: 8, alignItems: 'center', flex: 1 } as const,
+  stat: {
+    backgroundColor: '#1a1d23',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    flex: 1,
+  } as const,
   statValue: { color: '#e6e8eb', fontSize: 18, fontWeight: '700' } as const,
   statLabel: { color: '#7a818b', fontSize: 10, marginTop: 2 } as const,
   cta: {

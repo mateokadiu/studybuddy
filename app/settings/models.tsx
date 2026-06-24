@@ -1,8 +1,13 @@
-import { useState } from 'react';
-import { FlatList, Pressable, Text, View, ActivityIndicator, Alert } from 'react-native';
-import { useSettings, type LlmModelId } from '@/stores/settings.store';
-import { MODEL_CATALOG, getModelsService, type ModelSpec, type DownloadStatus } from '@/services/models.service';
 import { ProgressRing } from '@/components/progress-ring/ProgressRing';
+import {
+  type DownloadStatus,
+  MODEL_CATALOG,
+  type ModelSpec,
+  getModelsService,
+} from '@/services/models.service';
+import { type LlmModelId, useSettings } from '@/stores/settings.store';
+import { useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, Pressable, Text, View } from 'react-native';
 
 function fmtBytes(n: number): string {
   const gb = n / 1_000_000_000;
@@ -32,9 +37,7 @@ export default function ModelsScreen() {
   return (
     <View style={{ flex: 1 }}>
       <FlatList
-        ListHeaderComponent={
-          <Text style={styles.section}>language model</Text>
-        }
+        ListHeaderComponent={<Text style={styles.section}>language model</Text>}
         data={llms}
         keyExtractor={(m) => m.id}
         contentContainerStyle={{ padding: 12, gap: 8 }}
@@ -97,10 +100,7 @@ function ModelRow({
   }
 
   return (
-    <Pressable
-      onPress={onSelect}
-      style={[styles.row, active ? styles.rowActive : null]}
-    >
+    <Pressable onPress={onSelect} style={[styles.row, active ? styles.rowActive : null]}>
       <View style={{ flex: 1 }}>
         <Text style={styles.title}>{spec.name}</Text>
         <Text style={styles.sub}>
@@ -115,7 +115,9 @@ function ModelRow({
           <ProgressRing progress={progress} size={44} thickness={4} label={label} />
         )}
         <Pressable onPress={onDownload} style={styles.ctaSmall}>
-          <Text style={styles.ctaSmallText}>{status.state === 'installed' ? 'redownload' : 'download'}</Text>
+          <Text style={styles.ctaSmallText}>
+            {status.state === 'installed' ? 'redownload' : 'download'}
+          </Text>
         </Pressable>
       </View>
     </Pressable>
@@ -124,11 +126,23 @@ function ModelRow({
 
 const styles = {
   section: { color: '#7a818b', fontSize: 12, marginBottom: 4, paddingHorizontal: 4 } as const,
-  row: { flexDirection: 'row', backgroundColor: '#1a1d23', padding: 12, borderRadius: 8, gap: 12, alignItems: 'center' } as const,
+  row: {
+    flexDirection: 'row',
+    backgroundColor: '#1a1d23',
+    padding: 12,
+    borderRadius: 8,
+    gap: 12,
+    alignItems: 'center',
+  } as const,
   rowActive: { borderColor: '#7aa2ff', borderWidth: 1 } as const,
   title: { color: '#e6e8eb', fontSize: 14, fontWeight: '600' } as const,
   sub: { color: '#7a818b', fontSize: 11, marginTop: 2 } as const,
   err: { color: '#ff7a7a', fontSize: 11, marginTop: 2 } as const,
-  ctaSmall: { backgroundColor: '#0f1115', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 } as const,
+  ctaSmall: {
+    backgroundColor: '#0f1115',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  } as const,
   ctaSmallText: { color: '#7aa2ff', fontSize: 11 } as const,
 };

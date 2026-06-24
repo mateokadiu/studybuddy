@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { generatedCardSchema, generatedCardsSchema } from './card';
 
 describe('generatedCardSchema', () => {
@@ -13,15 +13,11 @@ describe('generatedCardSchema', () => {
   });
 
   it('rejects empty front', () => {
-    expect(() =>
-      generatedCardSchema.parse({ type: 'qa', front: '', back: 'x' }),
-    ).toThrow();
+    expect(() => generatedCardSchema.parse({ type: 'qa', front: '', back: 'x' })).toThrow();
   });
 
   it('rejects unknown type', () => {
-    expect(() =>
-      generatedCardSchema.parse({ type: 'rambo', front: 'x', back: 'y' }),
-    ).toThrow();
+    expect(() => generatedCardSchema.parse({ type: 'rambo', front: 'x', back: 'y' })).toThrow();
   });
 
   it('page is optional', () => {

@@ -1,11 +1,11 @@
-import { useMemo } from 'react';
-import { FlatList, Pressable, Text, View, ActivityIndicator } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { getDb } from '@/db/client';
+import { type Deck, type Document, cards, decks, documents } from '@/db/schema';
+import { useDeckStore } from '@/stores/deck.store';
 import { useQuery } from '@tanstack/react-query';
 import { desc, eq, sql } from 'drizzle-orm';
-import { getDb } from '@/db/client';
-import { cards, decks, documents, type Deck, type Document } from '@/db/schema';
-import { useDeckStore } from '@/stores/deck.store';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useMemo } from 'react';
+import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 
 interface DeckRow extends Deck {
   docTitle: string | null;
@@ -81,7 +81,10 @@ export default function DecksScreen() {
               style={[styles.chip, filter === item.id ? styles.chipActive : null]}
               onPress={() => setFilter(item.id)}
             >
-              <Text style={filter === item.id ? styles.chipTextActive : styles.chipText} numberOfLines={1}>
+              <Text
+                style={filter === item.id ? styles.chipTextActive : styles.chipText}
+                numberOfLines={1}
+              >
                 {item.title}
               </Text>
             </Pressable>
@@ -131,7 +134,12 @@ const styles = {
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' } as const,
   muted: { color: '#7a818b' } as const,
   filterBar: { borderBottomColor: '#1f2329', borderBottomWidth: 1 } as const,
-  chip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14, backgroundColor: '#1a1d23' } as const,
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 14,
+    backgroundColor: '#1a1d23',
+  } as const,
   chipActive: { backgroundColor: '#7aa2ff' } as const,
   chipText: { color: '#7a818b', fontSize: 13 } as const,
   chipTextActive: { color: '#0f1115', fontSize: 13, fontWeight: '600' } as const,

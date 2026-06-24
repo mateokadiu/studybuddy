@@ -1,13 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { cosine } from '@/lib/cosine';
+import { describe, expect, it } from 'vitest';
 import {
-  EMBED_DIM,
   EMBED_BATCH_SIZE,
+  EMBED_DIM,
+  benchEmbed,
+  embedAllChunked,
   getEmbedService,
   mockEmbed,
-  embedAllChunked,
-  benchEmbed,
 } from './embed.service';
-import { cosine } from '@/lib/cosine';
 
 describe('embed service (mock)', () => {
   it('produces 384-dim float32 vectors', async () => {

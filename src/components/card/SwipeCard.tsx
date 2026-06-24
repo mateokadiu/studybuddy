@@ -1,5 +1,5 @@
-import { type ReactNode } from 'react';
-import { View, Text } from 'react-native';
+import type { ReactNode } from 'react';
+import { Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
@@ -65,10 +65,18 @@ export function SwipeCard({ children, enabled, onSwipe }: Props) {
     ],
   }));
 
-  const hintUp = useAnimatedStyle(() => ({ opacity: interpolate(ty.value, [-THRESHOLD, 0], [1, 0]) }));
-  const hintDown = useAnimatedStyle(() => ({ opacity: interpolate(ty.value, [0, THRESHOLD], [0, 1]) }));
-  const hintLeft = useAnimatedStyle(() => ({ opacity: interpolate(tx.value, [-THRESHOLD, 0], [1, 0]) }));
-  const hintRight = useAnimatedStyle(() => ({ opacity: interpolate(tx.value, [0, THRESHOLD], [0, 1]) }));
+  const hintUp = useAnimatedStyle(() => ({
+    opacity: interpolate(ty.value, [-THRESHOLD, 0], [1, 0]),
+  }));
+  const hintDown = useAnimatedStyle(() => ({
+    opacity: interpolate(ty.value, [0, THRESHOLD], [0, 1]),
+  }));
+  const hintLeft = useAnimatedStyle(() => ({
+    opacity: interpolate(tx.value, [-THRESHOLD, 0], [1, 0]),
+  }));
+  const hintRight = useAnimatedStyle(() => ({
+    opacity: interpolate(tx.value, [0, THRESHOLD], [0, 1]),
+  }));
 
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

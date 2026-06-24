@@ -12,12 +12,12 @@
  * doc, runs cosine in a tight loop, returns top-k.
  */
 
-import { eq, sql } from 'drizzle-orm';
-import { cosine } from '@/lib/cosine';
-import { EMBED_DIM } from '@/services/embed.service';
 import { getDb } from '@/db/client';
 import { chunks } from '@/db/schema';
+import { cosine } from '@/lib/cosine';
+import { EMBED_DIM } from '@/services/embed.service';
 import type { RetrievedChunk } from '@/types/chunk';
+import { eq, sql } from 'drizzle-orm';
 
 export interface InsertChunkArgs {
   id: string;

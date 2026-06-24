@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { FlatList, Pressable, Text, View, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
-import { eq, asc } from 'drizzle-orm';
 import { getDb } from '@/db/client';
-import { chunks, documents, type Chunk, type Document } from '@/db/schema';
+import { type Chunk, type Document, chunks, documents } from '@/db/schema';
+import { useQuery } from '@tanstack/react-query';
+import { asc, eq } from 'drizzle-orm';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useMemo, useRef } from 'react';
+import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
 
 interface DocDetail {
   doc: Document;
@@ -13,10 +13,7 @@ interface DocDetail {
 
 async function loadDocDetail(docId: string): Promise<DocDetail | null> {
   const db = getDb();
-  const docs = (await db
-    .select()
-    .from(documents)
-    .where(eq(documents.id, docId))) as Document[];
+  const docs = (await db.select().from(documents).where(eq(documents.id, docId))) as Document[];
   if (docs.length === 0) return null;
 
   const rows = (await db
@@ -49,7 +46,9 @@ export default function DocDetailScreen() {
   );
 
   // FlatList ref-based scroll-to-index when a chip routes us here
-  const listRef = useRef<{ scrollToIndex(p: { index: number; animated?: boolean }): void } | null>(null);
+  const listRef = useRef<{ scrollToIndex(p: { index: number; animated?: boolean }): void } | null>(
+    null,
+  );
   useEffect(() => {
     if (!focusChunkId || !q.data) return;
     const idx = q.data.chunks.findIndex((c) => c.id === focusChunkId);
@@ -88,10 +87,14 @@ export default function DocDetailScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>{doc.title}</Text>
         <Text style={styles.sub}>
-          {doc.status} · {doc.pageCount} pp · {chunkRows.length} chunks · {Math.round(totalTokens / 1000)}k tokens
+          {doc.status} · {doc.pageCount} pp · {chunkRows.length} chunks ·{' '}
+          {Math.round(totalTokens / 1000)}k tokens
         </Text>
         <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-          <Pressable style={styles.cta} onPress={() => router.push(`/(tabs)/chat/${doc.id}` as never)}>
+          <Pressable
+            style={styles.cta}
+            onPress={() => router.push(`/(tabs)/chat/${doc.id}` as never)}
+          >
             <Text style={styles.ctaText}>chat with doc</Text>
           </Pressable>
           <Pressable
@@ -126,9 +129,20 @@ const styles = {
   header: { padding: 16, borderBottomColor: '#1f2329', borderBottomWidth: 1 } as const,
   title: { color: '#e6e8eb', fontSize: 20, fontWeight: '700' } as const,
   sub: { color: '#7a818b', fontSize: 12, marginTop: 4 } as const,
-  cta: { backgroundColor: '#7aa2ff', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 } as const,
+  cta: {
+    backgroundColor: '#7aa2ff',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  } as const,
   ctaText: { color: '#0f1115', fontWeight: '600' } as const,
-  ctaOutline: { borderColor: '#7aa2ff', borderWidth: 1, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 } as const,
+  ctaOutline: {
+    borderColor: '#7aa2ff',
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  } as const,
   ctaOutlineText: { color: '#7aa2ff', fontWeight: '600' } as const,
   row: { backgroundColor: '#1a1d23', padding: 10, borderRadius: 6 } as const,
   rowFocused: { backgroundColor: '#1e3a5f', borderColor: '#7aa2ff', borderWidth: 1 } as const,

@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { Pressable, Text, View, TextInput, ActivityIndicator, Alert } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { eq } from 'drizzle-orm';
 import { getDb } from '@/db/client';
-import { cards, type Card } from '@/db/schema';
+import { type Card, cards } from '@/db/schema';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { eq } from 'drizzle-orm';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Pressable, Text, TextInput, View } from 'react-native';
 
 async function loadCard(cardId: string): Promise<Card | null> {
   const db = getDb();
@@ -134,8 +134,19 @@ const styles = {
   muted: { color: '#7a818b' } as const,
   label: { color: '#7a818b', fontSize: 12, marginTop: 4 } as const,
   input: { backgroundColor: '#1a1d23', color: '#e6e8eb', padding: 10, borderRadius: 6 } as const,
-  save: { backgroundColor: '#7aa2ff', paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8 } as const,
+  save: {
+    backgroundColor: '#7aa2ff',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 8,
+  } as const,
   saveText: { color: '#0f1115', fontWeight: '600' } as const,
-  danger: { borderColor: '#ff7a7a', borderWidth: 1, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 8 } as const,
+  danger: {
+    borderColor: '#ff7a7a',
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 8,
+  } as const,
   dangerText: { color: '#ff7a7a', fontWeight: '600' } as const,
 };

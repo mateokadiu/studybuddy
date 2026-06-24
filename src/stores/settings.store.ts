@@ -1,8 +1,12 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import { mmkvStorage } from '@/lib/mmkv';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
-export type LlmModelId = 'llama-3.2-3b-instruct-q4' | 'phi-3.5-mini-q4' | 'gemma-2-2b-q4' | 'llama-3.2-1b-q4';
+export type LlmModelId =
+  | 'llama-3.2-3b-instruct-q4'
+  | 'phi-3.5-mini-q4'
+  | 'gemma-2-2b-q4'
+  | 'llama-3.2-1b-q4';
 export type EmbedModelId = 'all-minilm-l6-v2';
 
 export interface SettingsState {

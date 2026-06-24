@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -6,7 +7,6 @@ import Animated, {
   interpolate,
   Easing,
 } from 'react-native-reanimated';
-import { useEffect } from 'react';
 
 export interface CardProps {
   front: string;
@@ -79,7 +79,15 @@ const styles = {
     gap: 16,
   } as const,
   faceBack: { backgroundColor: '#161920' } as const,
-  typeBadge: { position: 'absolute', top: 12, left: 12, backgroundColor: '#0f1115', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 } as const,
+  typeBadge: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    backgroundColor: '#0f1115',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  } as const,
   typeBadgeText: { color: '#7aa2ff', fontSize: 10, textTransform: 'uppercase' } as const,
   text: { color: '#e6e8eb', fontSize: 20, textAlign: 'center' } as const,
   meta: { position: 'absolute', bottom: 12, right: 16, color: '#7a818b', fontSize: 11 } as const,

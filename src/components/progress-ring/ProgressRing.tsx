@@ -52,7 +52,9 @@ export function ProgressRing({
         </Group>
       </Canvas>
       {label != null ? (
-        <View style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center' }}>
+        <View
+          style={{ position: 'absolute', inset: 0, alignItems: 'center', justifyContent: 'center' }}
+        >
           <Text style={{ color: '#e6e8eb', fontSize: size / 5, fontWeight: '600' }}>{label}</Text>
         </View>
       ) : null}

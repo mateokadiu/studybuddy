@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { cosine, l2sq, l2normalize, topKCosine } from './cosine';
+import { describe, expect, it } from 'vitest';
+import { cosine, l2normalize, l2sq, topKCosine } from './cosine';
 
 function f32(...v: number[]): Float32Array {
   return new Float32Array(v);

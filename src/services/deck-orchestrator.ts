@@ -7,13 +7,13 @@
  * for the per-deck progress overlay on the list screen.
  */
 
-import { eq } from 'drizzle-orm';
 import { getDb } from '@/db/client';
-import { cards as cardsTable, chunks, decks, documents, type Chunk } from '@/db/schema';
+import { type Chunk, cards as cardsTable, chunks, decks, documents } from '@/db/schema';
+import { newCard } from '@/lib/fsrs';
 import { id as uuid } from '@/lib/id';
 import { useDeckStore } from '@/stores/deck.store';
+import { eq } from 'drizzle-orm';
 import { generateCards } from './card-gen.service';
-import { newCard } from '@/lib/fsrs';
 import { packEmbedding } from './vector-store';
 
 export interface CreateDeckArgs {
@@ -29,17 +29,14 @@ export async function createDeckFromDoc(args: CreateDeckArgs): Promise<string> {
   const target = args.target ?? 30;
   const db = getDb();
 
-  const docRows = (await db
-    .select()
-    .from(documents)
-    .where(eq(documents.id, args.docId))) as Array<{ id: string; title: string }>;
+  const docRows = (await db.select().from(documents).where(eq(documents.id, args.docId))) as Array<{
+    id: string;
+    title: string;
+  }>;
   const doc = docRows[0];
   if (!doc) throw new Error(`unknown doc ${args.docId}`);
 
-  const chunkRows = (await db
-    .select()
-    .from(chunks)
-    .where(eq(chunks.docId, args.docId))) as Chunk[];
+  const chunkRows = (await db.select().from(chunks).where(eq(chunks.docId, args.docId))) as Chunk[];
 
   const deckId = uuid();
   await db.insert(decks).values({

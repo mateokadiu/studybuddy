@@ -1,12 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
-  schedule,
-  newCard,
-  retrievability,
-  defaultConfig,
   DEFAULT_FSRS_WEIGHTS,
-  optimize,
   type ReviewHistory,
+  defaultConfig,
+  newCard,
+  optimize,
+  retrievability,
+  schedule,
 } from './fsrs';
 
 const NOW = Date.UTC(2026, 0, 1, 9, 0, 0); // 2026-01-01 09:00 UTC

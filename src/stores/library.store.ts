@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import { mmkvStorage } from '@/lib/mmkv';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type IngestStage = 'extracting' | 'chunking' | 'embedding' | 'done' | 'failed';
 

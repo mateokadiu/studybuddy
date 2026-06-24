@@ -24,11 +24,6 @@
     },
     "types": ["node", "vitest/globals"]
   },
-  "include": [
-    "app/**/*",
-    "src/**/*",
-    "vitest.config.ts",
-    "drizzle.config.ts"
-  ],
+  "include": ["app/**/*", "src/**/*", "vitest.config.ts", "drizzle.config.ts"],
   "exclude": ["node_modules", "dist", "build", ".expo"]
 }

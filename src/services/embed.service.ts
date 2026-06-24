@@ -81,7 +81,8 @@ export async function benchEmbed(
 function useReal(): boolean {
   // EXPO_PUBLIC_* envs are inlined by metro at build time; in node they're
   // just process.env keys.
-  const v = (typeof process !== 'undefined' ? process.env?.EXPO_PUBLIC_USE_REAL_MODELS : undefined) ?? '0';
+  const v =
+    (typeof process !== 'undefined' ? process.env?.EXPO_PUBLIC_USE_REAL_MODELS : undefined) ?? '0';
   return v === '1' || v === 'true';
 }
 

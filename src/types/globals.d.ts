@@ -88,13 +88,34 @@ declare module 'react-native' {
   export const FlatList: <T>(props: FlatListProps<T>) => JSX.Element;
   export const SafeAreaView: ComponentType<ViewProps>;
   export const Image: ComponentType<ViewProps & { source: unknown; resizeMode?: string }>;
-  export const ActivityIndicator: ComponentType<ViewProps & { size?: 'small' | 'large' | number; color?: string }>;
-  export const Switch: ComponentType<ViewProps & { value?: boolean; onValueChange?: (v: boolean) => void }>;
-  export const Modal: ComponentType<ViewProps & { visible?: boolean; onRequestClose?: () => void; transparent?: boolean }>;
-  export const KeyboardAvoidingView: ComponentType<ViewProps & { behavior?: 'height' | 'padding' | 'position' }>;
-  export const Platform: { OS: 'ios' | 'android' | 'web'; select<T>(spec: { ios?: T; android?: T; web?: T; default?: T }): T };
+  export const ActivityIndicator: ComponentType<
+    ViewProps & { size?: 'small' | 'large' | number; color?: string }
+  >;
+  export const Switch: ComponentType<
+    ViewProps & { value?: boolean; onValueChange?: (v: boolean) => void }
+  >;
+  export const Modal: ComponentType<
+    ViewProps & { visible?: boolean; onRequestClose?: () => void; transparent?: boolean }
+  >;
+  export const KeyboardAvoidingView: ComponentType<
+    ViewProps & { behavior?: 'height' | 'padding' | 'position' }
+  >;
+  export const Platform: {
+    OS: 'ios' | 'android' | 'web';
+    select<T>(spec: { ios?: T; android?: T; web?: T; default?: T }): T;
+  };
   export const Dimensions: { get(dim: 'window' | 'screen'): { width: number; height: number } };
-  export const Alert: { alert(title: string, message?: string, buttons?: ReadonlyArray<{ text: string; onPress?: () => void; style?: 'default' | 'cancel' | 'destructive' }>): void };
+  export const Alert: {
+    alert(
+      title: string,
+      message?: string,
+      buttons?: ReadonlyArray<{
+        text: string;
+        onPress?: () => void;
+        style?: 'default' | 'cancel' | 'destructive';
+      }>,
+    ): void;
+  };
   export const Linking: { openURL(url: string): Promise<void> };
 
   export const StyleSheet: {
@@ -116,8 +137,12 @@ declare module 'react-native-gesture-handler' {
   export const Gesture: {
     Pan(): {
       enabled(v: boolean): ReturnType<typeof Gesture.Pan>;
-      onUpdate(fn: (e: { translationX: number; translationY: number }) => void): ReturnType<typeof Gesture.Pan>;
-      onEnd(fn: (e: { translationX: number; translationY: number }) => void): ReturnType<typeof Gesture.Pan>;
+      onUpdate(
+        fn: (e: { translationX: number; translationY: number }) => void,
+      ): ReturnType<typeof Gesture.Pan>;
+      onEnd(
+        fn: (e: { translationX: number; translationY: number }) => void,
+      ): ReturnType<typeof Gesture.Pan>;
     };
     Tap(): {
       onEnd(fn: () => void): ReturnType<typeof Gesture.Tap>;
@@ -134,11 +159,20 @@ declare module 'react-native-reanimated' {
   export function useSharedValue<T>(initial: T): SharedValue<T>;
   export function useDerivedValue<T>(fn: () => T, deps?: unknown[]): SharedValue<T>;
   export function useAnimatedStyle<T extends object>(fn: () => T, deps?: unknown[]): T;
-  export function withTiming<T>(toValue: T, config?: { duration?: number; easing?: unknown }, callback?: (finished: boolean) => void): T;
+  export function withTiming<T>(
+    toValue: T,
+    config?: { duration?: number; easing?: unknown },
+    callback?: (finished: boolean) => void,
+  ): T;
   export function withSpring<T>(toValue: T, config?: unknown): T;
   export function withDelay<T>(delay: number, animation: T): T;
   export function withSequence<T>(...animations: T[]): T;
-  export function interpolate(value: number, input: ReadonlyArray<number>, output: ReadonlyArray<number>, extrapolate?: unknown): number;
+  export function interpolate(
+    value: number,
+    input: ReadonlyArray<number>,
+    output: ReadonlyArray<number>,
+    extrapolate?: unknown,
+  ): number;
   export function runOnJS<T extends (...a: never[]) => unknown>(fn: T): T;
   export function runOnUI<T extends (...a: never[]) => unknown>(fn: T): T;
   export const Easing: {
@@ -169,7 +203,11 @@ declare module '@shopify/react-native-skia' {
     children?: ReactNode;
     onTouch?: (e: unknown) => void;
   }>;
-  export const Group: ComponentType<{ children?: ReactNode; transform?: unknown; opacity?: number }>;
+  export const Group: ComponentType<{
+    children?: ReactNode;
+    transform?: unknown;
+    opacity?: number;
+  }>;
   export const Rect: ComponentType<{
     x: number;
     y: number;
@@ -178,7 +216,15 @@ declare module '@shopify/react-native-skia' {
     color?: string;
     opacity?: number;
   }>;
-  export const Circle: ComponentType<{ cx: number; cy: number; r: number; color?: string; opacity?: number; style?: 'fill' | 'stroke'; strokeWidth?: number }>;
+  export const Circle: ComponentType<{
+    cx: number;
+    cy: number;
+    r: number;
+    color?: string;
+    opacity?: number;
+    style?: 'fill' | 'stroke';
+    strokeWidth?: number;
+  }>;
   export const Path: ComponentType<{
     path: unknown;
     color?: string;
@@ -186,8 +232,19 @@ declare module '@shopify/react-native-skia' {
     strokeWidth?: number;
     opacity?: number;
   }>;
-  export const Text: ComponentType<{ x: number; y: number; text: string; font?: unknown; color?: string }>;
-  export const Line: ComponentType<{ p1: { x: number; y: number }; p2: { x: number; y: number }; color?: string; strokeWidth?: number }>;
+  export const Text: ComponentType<{
+    x: number;
+    y: number;
+    text: string;
+    font?: unknown;
+    color?: string;
+  }>;
+  export const Line: ComponentType<{
+    p1: { x: number; y: number };
+    p2: { x: number; y: number };
+    color?: string;
+    strokeWidth?: number;
+  }>;
   export const Skia: {
     Path: {
       Make(): {
@@ -209,7 +266,12 @@ declare module 'expo-router' {
   export const Tabs: ComponentType<NavProps> & {
     Screen: ComponentType<{ name?: string; options?: unknown }>;
   };
-  export function Link(props: { href: string; asChild?: boolean; children?: ReactNode; style?: unknown }): JSX.Element;
+  export function Link(props: {
+    href: string;
+    asChild?: boolean;
+    children?: ReactNode;
+    style?: unknown;
+  }): JSX.Element;
   export function Redirect(props: { href: string }): null;
   export function useRouter(): {
     push: (href: string) => void;

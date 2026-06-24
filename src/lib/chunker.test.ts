@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { chunkByTokens, chunkParagraphs, paragraphs, sentences, countTokens } from './chunker';
+import { describe, expect, it } from 'vitest';
+import { chunkByTokens, chunkParagraphs, countTokens, paragraphs, sentences } from './chunker';
 
 describe('paragraphs', () => {
   it('splits on blank lines', () => {
@@ -80,7 +80,11 @@ describe('chunkByTokens', () => {
     const long = 'one. two. three. four. five. six. seven. eight. nine. ten. '.repeat(20);
     const pages = [{ page: 1, text: long }];
     const noOverlap = chunkByTokens(pages, { targetTokens: 40, maxTokens: 80, overlapTokens: 0 });
-    const withOverlap = chunkByTokens(pages, { targetTokens: 40, maxTokens: 80, overlapTokens: 20 });
+    const withOverlap = chunkByTokens(pages, {
+      targetTokens: 40,
+      maxTokens: 80,
+      overlapTokens: 20,
+    });
     // overlap should produce at least as many chunks and chunk-2's text should share a prefix with chunk-1's tail
     expect(withOverlap.length).toBeGreaterThanOrEqual(noOverlap.length);
     if (withOverlap.length >= 2) {

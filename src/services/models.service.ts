@@ -133,7 +133,10 @@ function nodeStub(): ModelsService {
     },
     async download(id, onProgress) {
       const spec = findModel(id);
-      onProgress({ spec, status: { state: 'downloading', bytesWritten: spec.sizeBytes, totalBytes: spec.sizeBytes } });
+      onProgress({
+        spec,
+        status: { state: 'downloading', bytesWritten: spec.sizeBytes, totalBytes: spec.sizeBytes },
+      });
       onProgress({ spec, status: { state: 'verifying' } });
       onProgress({ spec, status: { state: 'installed', path: fakePath(id) } });
       return fakePath(id);
@@ -182,11 +185,9 @@ function nativeImpl(): ModelsService {
 
   async function verifySha(uri: string, expected: string): Promise<boolean> {
     const data = await fs.readAsStringAsync(uri, { encoding: 'base64' });
-    const got = await cryptoMod.digestStringAsync(
-      cryptoMod.CryptoDigestAlgorithm.SHA256,
-      data,
-      { encoding: cryptoMod.CryptoEncoding.HEX },
-    );
+    const got = await cryptoMod.digestStringAsync(cryptoMod.CryptoDigestAlgorithm.SHA256, data, {
+      encoding: cryptoMod.CryptoEncoding.HEX,
+    });
     return got.toLowerCase() === expected.toLowerCase();
   }
 

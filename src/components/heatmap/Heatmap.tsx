@@ -1,8 +1,8 @@
+import { Canvas, Group, Rect } from '@shopify/react-native-skia';
 import { useState } from 'react';
-import { Canvas, Rect, Group } from '@shopify/react-native-skia';
-import { View, Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useSharedValue, useDerivedValue, withSpring, runOnJS } from 'react-native-reanimated';
+import { runOnJS, useDerivedValue, useSharedValue, withSpring } from 'react-native-reanimated';
 
 export interface HeatmapDay {
   /** ISO date YYYY-MM-DD */
@@ -89,14 +89,7 @@ export function Heatmap({ days, width, cellSize = 12, gap = 3 }: Props) {
                 const y = row * step;
                 const color = PALETTE[bucket(d.count)] as string;
                 return (
-                  <Rect
-                    key={d.date}
-                    x={x}
-                    y={y}
-                    width={cellSize}
-                    height={cellSize}
-                    color={color}
-                  />
+                  <Rect key={d.date} x={x} y={y} width={cellSize} height={cellSize} color={color} />
                 );
               })}
             </Group>

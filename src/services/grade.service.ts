@@ -8,11 +8,11 @@
  * atomic — if the app crashes between the two, neither lands.
  */
 
-import { eq } from 'drizzle-orm';
 import { getDb } from '@/db/client';
-import { cards, reviews, type Card } from '@/db/schema';
-import { schedule, type FsrsCard, type FsrsRating, type FsrsState } from '@/lib/fsrs';
+import { type Card, cards, reviews } from '@/db/schema';
+import { type FsrsCard, type FsrsRating, type FsrsState, schedule } from '@/lib/fsrs';
 import { id as uuid } from '@/lib/id';
+import { eq } from 'drizzle-orm';
 
 function dbCardToFsrs(c: Card): FsrsCard {
   return {

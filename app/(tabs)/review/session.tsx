@@ -1,15 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useQuery } from '@tanstack/react-query';
-import { eq, asc, and, lte } from 'drizzle-orm';
-import { getDb } from '@/db/client';
-import { cards, type Card } from '@/db/schema';
-import { useReview } from '@/stores/review.store';
-import { useSettings } from '@/stores/settings.store';
 import { Card as Flashcard } from '@/components/card/Card';
 import { SwipeCard, type SwipeDirection } from '@/components/card/SwipeCard';
+import { getDb } from '@/db/client';
+import { type Card, cards } from '@/db/schema';
 import { gradeCard } from '@/services/grade.service';
+import { useReview } from '@/stores/review.store';
+import { useSettings } from '@/stores/settings.store';
+import { useQuery } from '@tanstack/react-query';
+import { and, asc, eq, lte } from 'drizzle-orm';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 const DIR_TO_RATING: Record<SwipeDirection, 1 | 2 | 3 | 4> = {
   down: 1, // again
@@ -21,10 +21,13 @@ const DIR_TO_RATING: Record<SwipeDirection, 1 | 2 | 3 | 4> = {
 async function loadDueCards(deckId: string | null, limit: number): Promise<Card[]> {
   const db = getDb();
   const now = new Date();
-  const where = deckId
-    ? and(eq(cards.deckId, deckId), lte(cards.due, now))
-    : lte(cards.due, now);
-  const rows = (await db.select().from(cards).where(where).orderBy(asc(cards.due)).limit(limit)) as Card[];
+  const where = deckId ? and(eq(cards.deckId, deckId), lte(cards.due, now)) : lte(cards.due, now);
+  const rows = (await db
+    .select()
+    .from(cards)
+    .where(where)
+    .orderBy(asc(cards.due))
+    .limit(limit)) as Card[];
   return rows;
 }
 
@@ -83,7 +86,7 @@ export default function ReviewSessionScreen() {
         <Text style={styles.empty}>nothing due. nice work.</Text>
         <Pressable
           style={styles.cta}
-          onPress={() => router.replace(`/(tabs)/review/done` as never)}
+          onPress={() => router.replace('/(tabs)/review/done' as never)}
         >
           <Text style={styles.ctaText}>see summary</Text>
         </Pressable>
@@ -111,7 +114,7 @@ export default function ReviewSessionScreen() {
     <View style={{ flex: 1 }}>
       <View style={styles.headerBar}>
         <Text style={styles.headerText}>
-          {(session?.done.length ?? 0)} / {(session?.queue.length ?? 0) + (session?.done.length ?? 0)}
+          {session?.done.length ?? 0} / {(session?.queue.length ?? 0) + (session?.done.length ?? 0)}
         </Text>
       </View>
       <SwipeCard enabled={true} onSwipe={handleSwipe}>
@@ -135,9 +138,19 @@ export default function ReviewSessionScreen() {
 const styles = {
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 } as const,
   empty: { color: '#e6e8eb', fontSize: 16 } as const,
-  cta: { backgroundColor: '#7aa2ff', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 8 } as const,
+  cta: {
+    backgroundColor: '#7aa2ff',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 8,
+  } as const,
   ctaText: { color: '#0f1115', fontWeight: '600' } as const,
-  headerBar: { padding: 12, borderBottomColor: '#1f2329', borderBottomWidth: 1, alignItems: 'center' } as const,
+  headerBar: {
+    padding: 12,
+    borderBottomColor: '#1f2329',
+    borderBottomWidth: 1,
+    alignItems: 'center',
+  } as const,
   headerText: { color: '#e6e8eb', fontSize: 14 } as const,
   legend: { paddingVertical: 12, alignItems: 'center' } as const,
   legendText: { color: '#9aa0a8', fontSize: 12 } as const,

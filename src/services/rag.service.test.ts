@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { extractCites, markUncitedSentences } from './rag.service';
 import type { RetrievedChunk } from '@/types/chunk';
+import { describe, expect, it } from 'vitest';
+import { extractCites, markUncitedSentences } from './rag.service';
 
 const retrieved: RetrievedChunk[] = [
   { id: 'c1', docId: 'd1', idx: 0, text: '', pageStart: 1, pageEnd: 3, score: 0.9 },

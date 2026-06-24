@@ -12,14 +12,14 @@
  * in real time without waiting for the whole batch.
  */
 
-import { kmeans } from '@/lib/kmeans';
-import { cosine } from '@/lib/cosine';
-import { unpackEmbedding } from '@/services/vector-store';
-import { getEmbedService, EMBED_DIM } from '@/services/embed.service';
-import { getLlmService } from '@/services/llm.service';
-import { CARD_GEN_PROMPT_VERSION, buildCardGenPrompt } from '@/prompts/card-gen.v1';
-import { generatedCardsSchema, type GeneratedCard } from '@/types/card';
 import type { Chunk } from '@/db/schema';
+import { cosine } from '@/lib/cosine';
+import { kmeans } from '@/lib/kmeans';
+import { CARD_GEN_PROMPT_VERSION, buildCardGenPrompt } from '@/prompts/card-gen.v1';
+import { EMBED_DIM, getEmbedService } from '@/services/embed.service';
+import { getLlmService } from '@/services/llm.service';
+import { unpackEmbedding } from '@/services/vector-store';
+import { type GeneratedCard, generatedCardsSchema } from '@/types/card';
 
 export interface CardGenInput {
   /** chunks with embeddings already populated */
@@ -87,7 +87,9 @@ export async function generateCards(
   const llm = getLlmService();
   const embed = getEmbedService();
   const dedup = input.dedupThreshold ?? 0.92;
-  const accepted: Array<GeneratedCard & { sourceChunkId: string; questionEmbedding: Float32Array }> = [];
+  const accepted: Array<
+    GeneratedCard & { sourceChunkId: string; questionEmbedding: Float32Array }
+  > = [];
 
   // sample twice as many chunks as we'd theoretically need, so we have
   // spare to retry if dedup kills a bunch

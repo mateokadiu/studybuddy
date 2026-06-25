@@ -44,9 +44,6 @@ importers:
       expo-status-bar:
         specifier: ~56.0.4
         version: 56.0.4(expo@56.0.12)(react-native@0.85.3(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))(react@19.2.3)
-      gpt-tokenizer:
-        specifier: ^3.4.0
-        version: 3.4.0
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -2673,9 +2670,6 @@ packages:
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
-
-  gpt-tokenizer@3.4.0:
-    resolution: {integrity: sha512-wxFLnhIXTDjYebd9A9pGl3e31ZpSypbpIJSOswbgop5jLte/AsZVDvjlbEuVFlsqZixVKqbcoNmRlFDf6pz/UQ==}
 
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
@@ -5640,9 +5634,7 @@ snapshots:
       metro-runtime: 0.84.4
     transitivePeerDependencies:
       - '@babel/core'
-      - bufferutil
       - supports-color
-      - utf-8-validate
 
   '@react-native/normalize-colors@0.74.89': {}
 
@@ -6786,8 +6778,6 @@ snapshots:
       path-scurry: 2.0.2
 
   gopd@1.2.0: {}
-
-  gpt-tokenizer@3.4.0: {}
 
   graceful-fs@4.2.11: {}
 

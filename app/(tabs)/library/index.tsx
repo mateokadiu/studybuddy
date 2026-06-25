@@ -44,7 +44,7 @@ export default function LibraryScreen() {
     <View style={{ flex: 1 }}>
       <FlatList
         data={rows}
-        keyExtractor={(d) => d.id}
+        keyExtractor={(d, i) => `${d.id ?? 'row'}-${i}`}
         contentContainerStyle={{ padding: 12, gap: 8 }}
         renderItem={({ item }) => {
           const ingest = ingests[item.id];

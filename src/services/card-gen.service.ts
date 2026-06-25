@@ -65,7 +65,7 @@ function sampleChunkIndices(chunks: ReadonlyArray<Chunk>, k: number): number[] {
   const cap = Math.min(k, withEmb.length);
   const matrix = new Float32Array(withEmb.length * EMBED_DIM);
   for (let i = 0; i < withEmb.length; i++) {
-    const v = unpackEmbedding(withEmb[i]!.embedding as Buffer);
+    const v = unpackEmbedding(withEmb[i]!.embedding as Uint8Array);
     matrix.set(v, i * EMBED_DIM);
   }
   const { medoids } = kmeans(matrix, EMBED_DIM, { k: cap, seed: 17 });

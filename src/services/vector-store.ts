@@ -31,17 +31,23 @@ export interface InsertChunkArgs {
   embedding: Float32Array;
 }
 
-/** Pack a Float32Array into a Buffer suitable for SQLite BLOB column. */
-export function packEmbedding(v: Float32Array): Buffer {
-  return Buffer.from(v.buffer, v.byteOffset, v.byteLength);
+/**
+ * Pack a Float32Array into a byte sequence suitable for SQLite BLOB.
+ * RN's Hermes runtime does not expose Node's Buffer global; on RN we return
+ * a plain Uint8Array (quick-sqlite accepts it). On node we still return a
+ * Buffer-shaped view that's structurally compatible.
+ */
+export function packEmbedding(v: Float32Array): Uint8Array {
+  return new Uint8Array(v.buffer, v.byteOffset, v.byteLength);
 }
 
 /** Unpack a SQLite BLOB into a Float32Array view (zero-copy when aligned). */
-export function unpackEmbedding(blob: Buffer | Uint8Array | null | undefined): Float32Array {
+export function unpackEmbedding(blob: Uint8Array | ArrayBuffer | null | undefined): Float32Array {
   if (!blob) return new Float32Array(EMBED_DIM);
+  const u8 = blob instanceof Uint8Array ? blob : new Uint8Array(blob);
   // copy into a freshly aligned buffer to be safe across native + node
-  const ab = new ArrayBuffer(blob.byteLength);
-  new Uint8Array(ab).set(blob);
+  const ab = new ArrayBuffer(u8.byteLength);
+  new Uint8Array(ab).set(u8);
   return new Float32Array(ab);
 }
 
@@ -106,7 +112,7 @@ export async function topKForDoc(
 
   const heap: RetrievedChunk[] = [];
   for (const row of rows) {
-    const emb = unpackEmbedding(row.embedding as Buffer | null);
+    const emb = unpackEmbedding(row.embedding as Uint8Array | null);
     const score = cosine(query, emb);
     if (heap.length < k) {
       heap.push({
@@ -176,8 +182,8 @@ export function registerCosineUDF(): boolean {
     conn.registerFunction(
       'cosine',
       (a: unknown, b: unknown) => {
-        const av = unpackEmbedding(a as Buffer);
-        const bv = unpackEmbedding(b as Buffer);
+        const av = unpackEmbedding(a as Uint8Array);
+        const bv = unpackEmbedding(b as Uint8Array);
         return cosine(av, bv);
       },
       { deterministic: true },

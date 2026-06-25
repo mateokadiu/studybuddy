@@ -1,3 +1,7 @@
+// Polyfill `crypto.getRandomValues` — must be imported before `uuid`. RN's
+// Hermes runtime doesn't ship a web-crypto, and `uuid` v9+ insists on it.
+import 'react-native-get-random-values';
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';

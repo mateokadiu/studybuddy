@@ -37,8 +37,11 @@ export interface InsertChunkArgs {
  * a plain Uint8Array (quick-sqlite accepts it). On node we still return a
  * Buffer-shaped view that's structurally compatible.
  */
-export function packEmbedding(v: Float32Array): Uint8Array {
-  return new Uint8Array(v.buffer, v.byteOffset, v.byteLength);
+export function packEmbedding(v: Float32Array): Buffer {
+  // Buffer.from(ArrayBuffer, offset, length) — unambiguously returns Buffer in
+  // every TS lib config; new Uint8Array(...) was inferred as Uint8Array in CI
+  // (lib: ["dom"] context) and broke Drizzle's column type expectation.
+  return Buffer.from(v.buffer, v.byteOffset, v.byteLength);
 }
 
 /** Unpack a SQLite BLOB into a Float32Array view (zero-copy when aligned). */

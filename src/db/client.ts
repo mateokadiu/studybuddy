@@ -114,10 +114,10 @@ export async function migrate(): Promise<void> {
   for (const stmt of statements) {
     await driver.executeAsync(stmt);
   }
-  await driver.executeAsync(
-    'INSERT INTO _migrations (id, applied_at) VALUES (?, ?)',
-    ['0000_initial_schema', Date.now()],
-  );
+  await driver.executeAsync('INSERT INTO _migrations (id, applied_at) VALUES (?, ?)', [
+    '0000_initial_schema',
+    Date.now(),
+  ]);
   migrated = true;
 }
 

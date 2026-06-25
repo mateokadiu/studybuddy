@@ -75,7 +75,7 @@ export default function DecksScreen() {
           horizontal
           showsHorizontalScrollIndicator={false}
           data={[{ id: 'all', title: 'all decks' } as Document, ...(docsQ.data ?? [])]}
-          keyExtractor={(d, i) => `${d.id ?? "row"}-${i}`}
+          keyExtractor={(d, i) => `${d.id ?? 'row'}-${i}`}
           renderItem={({ item }) => (
             <Pressable
               style={[styles.chip, filter === item.id ? styles.chipActive : null]}
@@ -100,7 +100,7 @@ export default function DecksScreen() {
       ) : (
         <FlatList
           data={rows}
-          keyExtractor={(d, i) => `${d.id ?? "row"}-${i}`}
+          keyExtractor={(d, i) => `${d.id ?? 'row'}-${i}`}
           contentContainerStyle={{ padding: 12, gap: 8 }}
           renderItem={({ item }) => {
             const gen = gens[item.id];

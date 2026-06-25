@@ -39,7 +39,7 @@ export default function ModelsScreen() {
       <FlatList
         ListHeaderComponent={<Text style={styles.section}>language model</Text>}
         data={llms}
-        keyExtractor={(m, i) => `${m.id ?? "row"}-${i}`}
+        keyExtractor={(m, i) => `${m.id ?? 'row'}-${i}`}
         contentContainerStyle={{ padding: 12, gap: 8 }}
         renderItem={({ item }) => (
           <ModelRow

@@ -77,7 +77,7 @@ export default function ChatListScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             data={docsQ.data ?? []}
-            keyExtractor={(d, i) => `${d.id ?? "row"}-${i}`}
+            keyExtractor={(d, i) => `${d.id ?? 'row'}-${i}`}
             renderItem={({ item }) => (
               <Pressable style={styles.docChip} onPress={() => start.mutate(item.id)}>
                 <Text style={styles.docChipText} numberOfLines={1}>
@@ -92,7 +92,7 @@ export default function ChatListScreen() {
 
       <FlatList
         data={chatsQ.data ?? []}
-        keyExtractor={(c, i) => `${c.id ?? "row"}-${i}`}
+        keyExtractor={(c, i) => `${c.id ?? 'row'}-${i}`}
         contentContainerStyle={{ padding: 12, gap: 8 }}
         renderItem={({ item }) => (
           <Pressable

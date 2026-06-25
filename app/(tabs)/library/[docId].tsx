@@ -108,7 +108,7 @@ export default function DocDetailScreen() {
       <FlatList
         ref={listRef as never}
         data={chunkRows}
-        keyExtractor={(c, i) => `${c.id ?? "row"}-${i}`}
+        keyExtractor={(c, i) => `${c.id ?? 'row'}-${i}`}
         contentContainerStyle={{ padding: 12, gap: 6 }}
         renderItem={({ item }) => (
           <View style={[styles.row, focusChunkId === item.id ? styles.rowFocused : null]}>

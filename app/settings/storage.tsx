@@ -95,7 +95,7 @@ export default function StorageScreen() {
 
       <FlatList
         data={q.data}
-        keyExtractor={(d) => d.id}
+        keyExtractor={(d, i) => `${d.id ?? "row"}-${i}`}
         contentContainerStyle={{ padding: 12, gap: 8 }}
         renderItem={({ item }) => (
           <View style={styles.row}>

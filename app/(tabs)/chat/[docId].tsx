@@ -161,7 +161,7 @@ export default function ChatDocScreen() {
               ]
             : []),
         ]}
-        keyExtractor={(m) => m.id}
+        keyExtractor={(m, i) => `${m.id ?? "row"}-${i}`}
         contentContainerStyle={{ padding: 12, gap: 8 }}
         renderItem={({ item }) => <Bubble msg={item} />}
       />

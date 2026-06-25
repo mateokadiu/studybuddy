@@ -74,7 +74,7 @@ export default function DeckDetailScreen() {
 
       <FlatList
         data={cardRows}
-        keyExtractor={(c) => c.id}
+        keyExtractor={(c, i) => `${c.id ?? "row"}-${i}`}
         contentContainerStyle={{ padding: 12, gap: 8 }}
         renderItem={({ item }) => (
           <Pressable

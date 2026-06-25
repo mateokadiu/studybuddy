@@ -6,6 +6,7 @@
  */
 
 import { drizzle } from 'drizzle-orm/sqlite-proxy';
+import { INITIAL_SCHEMA_SQL } from './migrations.gen';
 import type * as Schema from './schema';
 
 const DB_NAME = 'studybuddy.db';
@@ -88,10 +89,43 @@ export function getDb(): Db {
   return cachedDb;
 }
 
+/**
+ * Apply the bundled migration SQL on first boot. Idempotent: drizzle's output
+ * uses `CREATE TABLE` (not IF NOT EXISTS), so we track an `_applied` flag in a
+ * tiny meta table and skip subsequent runs.
+ */
+let migrated = false;
+export async function migrate(): Promise<void> {
+  if (migrated) return;
+  const driver = loadDriver();
+  await driver.executeAsync(
+    'CREATE TABLE IF NOT EXISTS _migrations (id TEXT PRIMARY KEY, applied_at INTEGER NOT NULL)',
+  );
+  const existing = await driver.executeAsync(
+    "SELECT id FROM _migrations WHERE id = '0000_initial_schema'",
+  );
+  if (existing.rows.length > 0) {
+    migrated = true;
+    return;
+  }
+  const statements = INITIAL_SCHEMA_SQL.split('--> statement-breakpoint')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  for (const stmt of statements) {
+    await driver.executeAsync(stmt);
+  }
+  await driver.executeAsync(
+    'INSERT INTO _migrations (id, applied_at) VALUES (?, ?)',
+    ['0000_initial_schema', Date.now()],
+  );
+  migrated = true;
+}
+
 /** Test/diagnostic hook — drop the cached driver + db. */
 export function _resetDbForTests(): void {
   cachedDriver = null;
   cachedDb = null;
+  migrated = false;
 }
 
 export { DB_NAME };

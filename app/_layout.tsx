@@ -5,7 +5,11 @@ import 'react-native-get-random-values';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+import { migrate } from '@/db/client';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,6 +22,27 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
+  const [ready, setReady] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    migrate()
+      .then(() => setReady(true))
+      .catch((e) => setErr(String(e instanceof Error ? e.message : e)));
+  }, []);
+
+  if (err) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#0f1115', justifyContent: 'center', padding: 24 }}>
+        <Text style={{ color: '#fca5a5', fontFamily: 'Menlo', fontSize: 13 }}>
+          db migration failed: {err}
+        </Text>
+      </View>
+    );
+  }
+  if (!ready) {
+    return <View style={{ flex: 1, backgroundColor: '#0f1115' }} />;
+  }
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>

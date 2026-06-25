@@ -42,8 +42,19 @@ function loadDriver(): KVDriver {
     return cachedDriver;
   }
 
-  const { MMKV } = require('react-native-mmkv') as { MMKV: new (cfg: { id: string }) => KVDriver };
-  cachedDriver = new MMKV({ id: STORAGE_ID });
+  // react-native-mmkv v4 ships `createMMKV` (factory) and dropped the `MMKV`
+  // class export. Earlier versions had `new MMKV(...)`. Support both.
+  const mod = require('react-native-mmkv') as {
+    createMMKV?: (cfg: { id: string }) => KVDriver;
+    MMKV?: new (cfg: { id: string }) => KVDriver;
+  };
+  if (mod.createMMKV) {
+    cachedDriver = mod.createMMKV({ id: STORAGE_ID });
+  } else if (mod.MMKV) {
+    cachedDriver = new mod.MMKV({ id: STORAGE_ID });
+  } else {
+    throw new Error('react-native-mmkv: neither createMMKV nor MMKV export found');
+  }
   return cachedDriver;
 }
 

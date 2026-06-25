@@ -20,7 +20,22 @@
     "web": {
       "bundler": "metro"
     },
-    "plugins": ["expo-router", "expo-document-picker", "expo-notifications"],
+    "plugins": [
+      "expo-router",
+      "expo-document-picker",
+      "expo-notifications",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "17.0"
+          },
+          "android": {
+            "minSdkVersion": 26
+          }
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": true
     }

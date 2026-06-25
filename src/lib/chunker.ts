@@ -7,7 +7,15 @@
  * UI and (eventually) scroll the source PDF view to the citation.
  */
 
-import { encode } from 'gpt-3-encoder';
+// gpt-tokenizer ships a ~3 MB vocab table; loading it at module-load time
+// blows Hermes' young-gen GC at app boot. Lazy-load on first use instead.
+let encodeImpl: ((s: string) => number[]) | null = null;
+function getEncode(): (s: string) => number[] {
+  if (encodeImpl) return encodeImpl;
+  const mod = require('gpt-tokenizer') as { encode: (s: string) => number[] };
+  encodeImpl = mod.encode;
+  return encodeImpl;
+}
 
 export interface PageText {
   /** 1-indexed page number */
@@ -59,7 +67,7 @@ export function sentences(s: string): string[] {
 
 /** Count BPE tokens for a string. */
 export function countTokens(s: string): number {
-  return encode(s).length;
+  return getEncode()(s).length;
 }
 
 /**

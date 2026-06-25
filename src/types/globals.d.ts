@@ -287,5 +287,5 @@ declare module 'expo-notifications';
 declare module 'expo-status-bar';
 declare module 'expo-constants';
 declare module 'expo-linking';
-declare module 'gpt-3-encoder';
+declare module 'gpt-tokenizer';
 declare module 'react-native-executorch';

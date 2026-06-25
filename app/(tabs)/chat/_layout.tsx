@@ -4,6 +4,7 @@ export default function ChatStack() {
   return (
     <Stack
       screenOptions={{
+        headerShown: false,
         headerStyle: { backgroundColor: '#0f1115' },
         headerTintColor: '#e6e8eb',
         contentStyle: { backgroundColor: '#0f1115' },

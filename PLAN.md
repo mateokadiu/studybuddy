@@ -13,7 +13,7 @@
 - **On-device card generation** — `Llama 3.2 3B` (or alternative, see §11) generates 20-50 high-quality Q-A flashcards per chunk, with quality controls (no duplicates, no trivia, mixed cloze + recall styles).
 - **FSRS-scheduled review** — daily review queue using the [Free Spaced Repetition Scheduler](https://github.com/open-spaced-repetition/fsrs4anki) (the algorithm Anki shipped as default in v23+). Better than SM-2 for retention curve.
 - **Chat with the doc** — ask anything, RAG retrieval over the local vector index, LLM answers with **page-cited evidence** rendered inline.
-- **Skia-rendered visualizations** — daily review heatmap, retention forecast curve, similarity rings on the doc browser. Senior craft signal.
+- **Skia-rendered visualizations** — daily review heatmap, retention forecast curve, similarity rings on the doc browser.
 - **Zero network** — no API keys, no telemetry, no analytics, no remote model calls. The whole app works offline once models are downloaded.
 - **Showcase-grade** — runnable end-to-end via `npx expo run:ios` and `npx expo run:android`. Demo video of 50-page PDF → 30 cards → first review session in under 90 seconds.
 
